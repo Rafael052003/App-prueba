@@ -147,11 +147,6 @@
         display: block !important; 
         padding: 0;
       }
-      .page-break { 
-        page-break-after: always;
-        height: 120px; /* Espacio para el pie de página */
-        display: block;
-      }
 
       .pdf-header { 
         text-align: center; 
@@ -185,7 +180,12 @@
         margin-left: auto; 
         margin-right: auto; 
         width: 90%; 
+        margin-bottom: 50px; /* Espacio para el pie de página */
       }
+      table:last-of-type {
+        margin-bottom: 20px; /* Menos margen si es la última tabla general */
+      }
+
       th, td { 
         border: 1px solid #333; 
         padding: 8px; 
@@ -207,14 +207,21 @@
         print-color-adjust: exact; 
       }
 
-      /* Estilos para el pie de página en impresión */
       .pdf-footer {
         text-align: center;
         font-size: 16pt; 
         font-weight: bold; 
         color: #666;
-        margin-top: 40px; /* Separación de la tabla */
+        margin-top: 20px; /* Separación de la tabla */
+        position: relative; /* Para que page-break-after funcione correctamente en el contenedor padre */
       }
+      .pdf-section-container {
+        page-break-after: always; /* Cada sección con su pie de página en una nueva hoja */
+      }
+      .pdf-section-container:last-of-type {
+        page-break-after: avoid; /* No romper página después de la última sección */
+      }
+
       .print-btn { display:none; }
 
       table th:nth-child(1), table td:nth-child(1){ width: 10%; } 
@@ -498,46 +505,33 @@
         secciones.forEach((sec, index) => {
             const rows = productos.filter(p => p.seccion === sec);
             if (rows.length) {
-                if (index > 0) {
-                    contentHtml += `<div class="page-break"></div>`;
-                }
+                // Inicia un contenedor para la sección que manejará el page-break-after
+                contentHtml += `<div class="pdf-section-container">`;
                 
                 contentHtml += `<div class="pdf-section-title">${sec}</div>`;
-                
-                // Agrupamos filas en bloques más pequeños
-                const rowsPerPage = 18; 
-                let pageRows = [];
-                for (let i = 0; i < rows.length; i++) {
-                    pageRows.push(rows[i]);
-                    if (pageRows.length === rowsPerPage || i === rows.length - 1) {
-                        contentHtml += `<table><thead><tr><th>PRECIO</th><th class="product-sensitive-header">PRODUCTO<br>SENSITIVO</th><th>07:00</th><th>12:00</th><th>15:00</th><th>22:00</th></tr></thead><tbody>`;
-                        pageRows.forEach(r => {
-                            let t0700_val = r.t0700 || '';
-                            let t1200_val = r.t1200 || '';
-                            let t1500_val = r.t1500 || '';
-                            let t2200_val = r.t2200 || '';
-                            let class0700 = getPdfCellClass(t0700_val, '', true); 
-                            let class1200 = getPdfCellClass(t1200_val, t0700_val, false);
-                            let class1500 = getPdfCellClass(t1500_val, t1200_val, false);
-                            let class2200 = getPdfCellClass(t2200_val, t1500_val, false);
-                            
-                            contentHtml += `<tr>
-                                <td>${r.precio||''}</td>
-                                <td class="product-sensitive-header" style="text-align: center;">${r.nombre||''}</td>
-                                <td class="${class0700}">${t0700_val}</td>
-                                <td class="${class1200}">${t1200_val}</td>
-                                <td class="${class1500}">${t1500_val}</td>
-                                <td class="${class2200}">${t2200_val}</td>
-                            </tr>`;
-                        });
-                        contentHtml += `</tbody></table>`;
-                        contentHtml += `<div class="pdf-footer">Powered by Rafael Ramos</div>`;
-                        if (i < rows.length - 1) {
-                            contentHtml += `<div class="page-break"></div>`;
-                        }
-                        pageRows = [];
-                    }
-                }
+                contentHtml += `<table><thead><tr><th>PRECIO</th><th class="product-sensitive-header">PRODUCTO<br>SENSITIVO</th><th>07:00</th><th>12:00</th><th>15:00</th><th>22:00</th></tr></thead><tbody>`;
+                rows.forEach(r => {
+                    let t0700_val = r.t0700 || '';
+                    let t1200_val = r.t1200 || '';
+                    let t1500_val = r.t1500 || '';
+                    let t2200_val = r.t2200 || '';
+                    let class0700 = getPdfCellClass(t0700_val, '', true); 
+                    let class1200 = getPdfCellClass(t1200_val, t0700_val, false);
+                    let class1500 = getPdfCellClass(t1500_val, t1200_val, false);
+                    let class2200 = getPdfCellClass(t2200_val, t1500_val, false);
+                    
+                    contentHtml += `<tr>
+                        <td>${r.precio||''}</td>
+                        <td class="product-sensitive-header" style="text-align: center;">${r.nombre||''}</td>
+                        <td class="${class0700}">${t0700_val}</td>
+                        <td class="${class1200}">${t1200_val}</td>
+                        <td class="${class1500}">${t1500_val}</td>
+                        <td class="${class2200}">${t2200_val}</td>
+                    </tr>`;
+                });
+                contentHtml += `</tbody></table>`;
+                contentHtml += `<div class="pdf-footer">Powered by Rafael Ramos</div>`;
+                contentHtml += `</div>`; // Cierra pdf-section-container
             }
         });
 
@@ -558,7 +552,19 @@
             text-align: center; 
           }
           .pdf-section-title { text-align: center; font-size: 16pt; font-weight: 700; margin-top: 20px; text-transform: uppercase;}
-          table { border-collapse: collapse; margin-top: 10px; font-size: 12pt; table-layout: fixed; margin-left: auto; margin-right: auto; width: 90%; }
+          table { 
+            border-collapse: collapse; 
+            margin-top: 10px; 
+            font-size: 12pt; 
+            table-layout: fixed; 
+            margin-left: auto; 
+            margin-right: auto; 
+            width: 90%; 
+            margin-bottom: 50px; /* Espacio para el pie de página */
+          }
+          table:last-of-type {
+            margin-bottom: 20px; /* Menos margen si es la última tabla general */
+          }
           th, td { border: 1px solid #333; padding: 8px; text-align: center; }
           th { background: #f0f0f0; font-weight: bold; }
           .increased { background-color: #d4edda !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -570,10 +576,15 @@
             font-size: 16pt; 
             font-weight: bold; 
             color: #666;
-            margin-top: 40px; 
-            margin-bottom: 20px;
+            margin-top: 20px; /* Separación de la tabla */
+            position: relative; /* Importante para que page-break-after funcione correctamente en el contenedor padre */
           }
-          .page-break { page-break-after: always; }
+          .pdf-section-container {
+            page-break-after: always; /* Cada sección (tabla + pie) en una nueva hoja */
+          }
+          .pdf-section-container:last-of-type {
+            page-break-after: avoid; /* No romper página después de la última sección */
+          }
           .print-btn { display:none; }
           
           table th:nth-child(1), table td:nth-child(1){ width: 10%; } 
@@ -592,7 +603,7 @@
         fullHtml += `<h1>LISTADO DE PRODUCTOS SENSITIVOS</h1>`;
         fullHtml += `<p>Fecha de exportación: ${new Date().toLocaleDateString('es-ES')}</p>`;
         fullHtml += `</div>`;
-        fullHtml += contentHtml;
+        fullHtml += contentHtml; // Aquí se inserta todo el contenido de secciones, tablas y pies de página
         fullHtml += `</div>`;
         fullHtml += `<button class='print-btn' onclick='window.print()'>Guardar como PDF</button>`;
         fullHtml += `</body></html>`;
