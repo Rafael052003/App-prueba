@@ -245,7 +245,7 @@
     <img src="icon-192.png" alt="Logo">
     <h2>PRODUCTOS SENSITIVOS</h2>
     <p>Powered by Rafael Ramos</p>
-    <p>Versión 1.0</p>
+    <p>Versión 1.5</p>
   </div>
 
   <div class="overlay" id="overlay"></div>
@@ -505,7 +505,7 @@
         html += `<p>Fecha de exportación: ${new Date().toLocaleDateString('es-ES')}</p>`;
         html += `</div>`;
 
-        const secciones = ['FORMULA', 'MEDICAMENTOS', 'CAVA', 'PASTILLAS CANINAS', 'LICORES']; 
+        const secciones = ['FORMULAS', 'MEDICAMENTOS', 'CAVA', 'PASTILLAS CANINAS', 'LICORES']; 
 
         secciones.forEach((sec, index) => {
             const rows = productos.filter(p => p.seccion === sec);
