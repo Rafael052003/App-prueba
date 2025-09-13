@@ -358,9 +358,9 @@
                     if (isFirstColumn) {
                         return '';
                     } else if (!isNaN(numCurrent) && !isNaN(numPrev) && prevValue !== '') {
-                        if (currentValue < prevValue) {
+                        if (currentValue < numPrev) {
                             return 'decreased';
-                        } else if (currentValue > prevValue) {
+                        } else if (currentValue > numPrev) {
                             return 'increased';
                         }
                     }
