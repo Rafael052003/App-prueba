@@ -1,12 +1,21 @@
 {
-  "name": "Productos Sensitivos",
+  "name": "PRODUCTOS SENSITIVOS",
   "short_name": "App Prueba",
-  "start_url": "index.html",
+  "description": "Aplicación para el seguimiento de productos sensitivos.",
+  "start_url": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#111827",
+  "background_color": "#111827",
+  "theme_color": "#ffffff",
   "icons": [
-    {"src": "icon-192.png","sizes": "192x192","type": "image/png"},
-    {"src": "icon-512.png","sizes": "512x512","type": "image/png"}
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
