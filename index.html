@@ -137,7 +137,6 @@
             <button id="btnExport" class="action-btn green"><i class="fas fa-file-pdf"></i> Generar PDF</button>
             <button id="btnClear" class="action-btn danger"><i class="fas fa-eraser"></i> Borrar Horarios</button>
             <button id="btnDeleteRow" class="action-btn danger"><i class="fas fa-trash-alt"></i> Eliminar Fila</button>
-            <button id="installButton" class="action-btn blue" style="display:none;"><i class="fas fa-download"></i> Instalar App</button>
         </div>
 
         <div class="table-container">
@@ -188,7 +187,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
+                navigator.serviceWorker.register('service-worker.js')
                     .then(registration => {
                         console.log('Service Worker registrado con éxito:', registration);
                     })
@@ -198,28 +197,6 @@
             });
         }
         
-        let deferredPrompt;
-        const installButton = document.getElementById('installButton');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installButton.style.display = 'flex';
-        });
-
-        installButton.addEventListener('click', () => {
-            installButton.style.display = 'none';
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('El usuario aceptó instalar la PWA');
-                } else {
-                    console.log('El usuario rechazó instalar la PWA');
-                }
-                deferredPrompt = null;
-            });
-        });
-
         (function () {
             const DEFAULT_SECCIONES = ['FORMULAS','MEDICAMENTOS','CAVA','PASTILLAS CANINAS','LICORES'];
             const STORAGE_KEY = 'productos_sensitivos_por_seccion';
@@ -370,7 +347,6 @@
                             if (index > -1) {
                                 productos[index][field] = td.innerText.trim();
                                 save();
-                                showToast('Texto actualizado', 'success');
                             }
                         });
                     });
