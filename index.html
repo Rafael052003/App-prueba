@@ -109,17 +109,107 @@
         }
 
         .logo-container img {
-            width: 250px; /* Ajusta el tamaño de tu logo */
+            width: 80px;
             height: auto;
+        }
+
+        /* Estilos del Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .modal-content h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .modal-content p, .modal-content li {
+            font-size: 14px;
+            color: var(--secondary-color);
+            line-height: 1.5;
+            text-align: justify;
+            margin-bottom: 10px;
+        }
+        
+        .modal-content ul {
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .close-btn {
+            color: var(--secondary-color);
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover, .close-btn:focus {
+            color: var(--primary-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        footer {
+            margin-top: 50px;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--secondary-color);
+        }
+        footer a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+        footer a:hover {
+            color: var(--primary-color);
         }
     </style>
 </head>
 <body>
     <div class="header-container">
         <div class="logo-container">
-            <img src="logo-empresa.png"alt="Logo de la Empresa">
+            <img src="icon-192.png" alt="Logo de la Empresa">
         </div>
         <h1>PORTAL DE APLICACIONES</h1>
+        <h2>GRUPO RIBA SMITH</h2>
     </div>
 
     <div class="apps-container">
@@ -135,5 +225,102 @@
             <span class="app-description">Control de inventario para productos de alta sensibilidad.</span>
         </a>
     </div>
+
+    <div id="welcomeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeWelcomeModal">&times;</span>
+            <h2>¡Bienvenido!</h2>
+            <p style="text-align: center;">Este es el portal oficial de aplicaciones. </p>
+            <p style="text-align: center;">Seleccione una de las aplicaciones para comenzar a trabajar.</p>
+        </div>
+    </div>
+
+    <div id="legalModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="legalModalTitle"></h2>
+            <div id="legalModalContent"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Rafael Ramos LLC. Todos los derechos reservados.</p>
+        <a href="#" id="openTerms">Términos y Condiciones</a> | <a href="#" id="openPrivacy">Política de Privacidad</a>
+    </footer>
+
+    <script>
+        const welcomeModal = document.getElementById('welcomeModal');
+        const legalModal = document.getElementById('legalModal');
+        const legalModalTitle = document.getElementById('legalModalTitle');
+        const legalModalContent = document.getElementById('legalModalContent');
+        const openTermsBtn = document.getElementById('openTerms');
+        const openPrivacyBtn = document.getElementById('openPrivacy');
+        const allCloseBtns = document.querySelectorAll('.close-btn');
+
+        // Lógica del Modal de Bienvenida
+        const WELCOME_MODAL_SHOWN_KEY = 'welcomeModalShown';
+
+        function showWelcomeModal() {
+            // Verificar si el modal ya se ha mostrado antes
+            const isShown = localStorage.getItem(WELCOME_MODAL_SHOWN_KEY);
+            if (!isShown) {
+                welcomeModal.style.display = 'block';
+                // Guardar la marca en localStorage para que no se muestre de nuevo
+                localStorage.setItem(WELCOME_MODAL_SHOWN_KEY, 'true');
+            }
+        }
+
+        function closeWelcomeModal() {
+            welcomeModal.style.display = 'none';
+        }
+
+        document.getElementById('closeWelcomeModal').onclick = closeWelcomeModal;
+
+        window.onload = showWelcomeModal;
+
+        // Lógica de los Modales de Términos y Política de Privacidad
+        const TERMS_CONTENT = `
+            <p>Este portal y sus aplicaciones son de uso interno y exclusivo para el personal de seguridad.</p>
+            <p>Al utilizar estas aplicaciones, usted acepta los siguientes **términos y condiciones**:</p>
+            <ul>
+                <li>Los datos registrados (temperaturas, precios, etc.) son propiedad de R/S Chitré Selecto y deben ser tratados con confidencialidad.</li>
+                <li>La información debe ser veraz y precisa. Cualquier registro falso o inexacto será responsabilidad del usuario que lo ingrese.</li>
+                <li>Las aplicaciones están diseñadas para facilitar el proceso de control y seguimiento. No reemplazan los procedimientos de seguridad establecidos.</li>
+            </ul>
+        `;
+        const PRIVACY_CONTENT = `
+            <p>Esta aplicación no recopila, almacena ni comparte ningún dato personal con terceros. Toda la información que usted ingresa se guarda únicamente en la memoria local de su dispositivo.</p>
+            <p>Al borrar los datos de la aplicación, estos se eliminan permanentemente de su dispositivo y no pueden ser recuperados.</p>
+        `;
+
+        openTermsBtn.onclick = (e) => {
+            e.preventDefault();
+            legalModalTitle.textContent = "Términos y Condiciones";
+            legalModalContent.innerHTML = TERMS_CONTENT;
+            legalModal.style.display = 'block';
+        };
+
+        openPrivacyBtn.onclick = (e) => {
+            e.preventDefault();
+            legalModalTitle.textContent = "Política de Privacidad";
+            legalModalContent.innerHTML = PRIVACY_CONTENT;
+            legalModal.style.display = 'block';
+        };
+        
+        allCloseBtns.forEach(btn => {
+            btn.onclick = (event) => {
+                event.target.closest('.modal').style.display = 'none';
+            };
+        });
+
+        window.onclick = function(event) {
+            if (event.target === welcomeModal) {
+                welcomeModal.style.display = 'none';
+            }
+            if (event.target === legalModal) {
+                legalModal.style.display = 'none';
+            }
+        };
+    </script>
 </body>
 </html>
