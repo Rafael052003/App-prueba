@@ -1,32 +1,53 @@
-const CACHE_NAME = 'app-cache-v' + new Date().getTime();
+const CACHE_NAME = 'app-cache-v1';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/revision_temperatura.html',
+  '/productos_sensitivos.html',
+  '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png',
+  // Puedes agregar más archivos estáticos aquí si los tienes
+];
 
-self.addEventListener('install', e => {
-  self.skipWaiting();
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(['index.html','manifest.json']);
-    })
-  );
-});
-
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(keys.map(k => { if (k !== CACHE_NAME) return caches.delete(k); }));
-    })
-  );
-  self.clients.claim();
-});
-
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    fetch(e.request)
-      .then(response => {
-        return caches.open(CACHE_NAME).then(cache => {
-          cache.put(e.request, response.clone());
-          return response;
-        });
+// Instalar el Service Worker y almacenar en caché los archivos
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        console.log('Cache opened');
+        return cache.addAll(urlsToCache);
       })
-      .catch(() => caches.match(e.request))
+  );
+});
+
+// Interceptar las solicitudes de red
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => {
+        // Si el archivo está en caché, devolverlo
+        if (response) {
+          return response;
+        }
+        // Si no está en caché, solicitarlo de la red
+        return fetch(event.request);
+      })
+  );
+});
+
+// Activar el Service Worker y eliminar cachés antiguas
+self.addEventListener('activate', (event) => {
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
 });
