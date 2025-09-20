@@ -1,7 +1,7 @@
 {
     "name": "Portal de Aplicaciones",
     "short_name": "Portal R/S",
-    "start_url": "/index.html",
+    "start_url": "/App-prueba/index.html",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#2c3e50",
