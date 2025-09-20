@@ -29,7 +29,7 @@
             font-family: 'Poppins', sans-serif;
             background: var(--bg-light);
             color: var(--primary-color);
-            padding-bottom: 80px; /* Espacio para el pie de página fijo */
+            padding-bottom: 80px;
             line-height: 1.6;
         }
         .main-content {
@@ -143,6 +143,25 @@
             font-size: 14px;
         }
         .chip.active { background: var(--primary-color); color: white; }
+        
+        /* Nuevo estilo para el recuadro de fecha */
+        .date-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .date-container label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .date-container input[type="date"] {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
 
         /* Tables */
         .table-container {
@@ -320,6 +339,11 @@
             </div>
         </header>
 
+        <div class="date-container">
+            <label for="review-date">Fecha de Revisión:</label>
+            <input type="date" id="review-date">
+        </div>
+
         <div class="controls-container">
             <div class="chips" id="chips"></div>
         </div>
@@ -478,8 +502,9 @@
             const termsModal = document.getElementById('termsModal');
             const openTermsModalBtn = document.getElementById('openTermsModal');
             const privacyModal = document.getElementById('privacyModal');
-            const openPrivacyModalBtn = document.getElementById('openPrivacyModal');
+            const openPrivacyModalBtn = document = document.getElementById('openPrivacyModal');
             const allCloseBtns = document.querySelectorAll('.close-btn');
+            const reviewDateInput = document.getElementById('review-date');
             
             let saveTimer = null;
             function save() {
@@ -693,6 +718,15 @@
                 }
                 const secciones = DEFAULT_SECCIONES;
                 let contentHtml = '';
+                const reviewDateValue = reviewDateInput.value;
+                let formattedReviewDate;
+                if (reviewDateValue) {
+                    const [y, m, d] = reviewDateValue.split('-');
+                    formattedReviewDate = `${d}/${m}/${y}`;
+                } else {
+                    formattedReviewDate = 'N/A';
+                }
+
                 secciones.forEach((sec) => {
                     const rows = productos.filter(p => p.seccion === sec);
                     if (rows.length) {
@@ -710,7 +744,7 @@
                             let class2200 = getPdfCellClass(t2200_val, t1500_val, false);
                             contentHtml += `<tr>
                                 <td>${r.precio || ''}</td>
-                                <td class="product-sensitive-header" style="text-align: center;">${r.nombre || ''}</td>
+                                <td class="product-sensitive-header" style="text-align: left;">${r.nombre || ''}</td>
                                 <td class="${class0700}">${t0700_val}</td>
                                 <td class="${class1200}">${t1200_val}</td>
                                 <td class="${class1500}">${t1500_val}</td>
@@ -718,15 +752,16 @@
                             </tr>`;
                         });
                         contentHtml += `</tbody></table>`;
-                        contentHtml += `<div class="pdf-footer">Powered by Rafael Ramos</div>`;
                         contentHtml += `</div>`;
                     }
                 });
+                
                 const today = new Date();
                 const day = String(today.getDate()).padStart(2, '0');
                 const month = String(today.getMonth() + 1).padStart(2, '0');
                 const year = today.getFullYear();
                 const formattedDate = `${day}/${month}/${year}`;
+                
                 let fullHtml = `<html><head><meta charset='utf-8'><title>Productos Sensitivos</title>
                     <style>
                         body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
@@ -752,11 +787,11 @@
                 fullHtml += `<h1>GRUPO RIBA SMITH</h1>`;
                 fullHtml += `<h1>R/S CHITRÉ SELECTO</h1>
                 <h1>LISTADO DE PRODUCTOS SENSITIVOS</h1>
-                <p>Fecha de exportación: ${formattedDate}</p>
+                <p>Fecha de Revisión: ${formattedReviewDate}</p>
                 </div>
                 ${contentHtml}
+                <div class="pdf-footer">Powered by Rafael Ramos</div>
                 </div>
-                <button class='print-btn' onclick='window.print()'>Guardar como PDF</button>
                 </body>
                 </html>`;
                 const printWindow = window.open('', '_blank');
@@ -820,9 +855,21 @@
                 sideMenu.classList.remove('open');
                 overlay.classList.remove('active');
             });
+
+            function getTodayDateFormattedForInput() {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
             window.addEventListener("load", () => {
                 setTimeout(() => { document.getElementById("splash").style.opacity = "0"; }, 1500);
                 setTimeout(() => { document.getElementById("splash").style.display = "none"; }, 2000);
+                if (!reviewDateInput.value) {
+                    reviewDateInput.value = getTodayDateFormattedForInput();
+                }
                 render();
             });
         })();
