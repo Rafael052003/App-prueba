@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal de Aplicaciones</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="./manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -219,7 +219,7 @@
         <div class="modal-content">
             <span class="close-btn" id="closeWelcomeModal">&times;</span>
             <h2>¡Bienvenido!</h2>
-            <p style="text-align: center;">Este es el portal oficial de aplicaciones.</p>
+            <p style="text-align: center;">Este es el portal oficial de aplicaciones. </p>
             <p style="text-align: center;">Seleccione una de las aplicaciones para comenzar a trabajar.</p>
         </div>
     </div>
@@ -310,6 +310,17 @@
                 legalModal.style.display = 'none';
             }
         };
+
+        // Se corrigió la ruta del service worker y se agregó la lógica para que el navegador lo registre
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function() {
+            navigator.serviceWorker.register('./service-worker.js').then(function(registration) {
+              console.log('Service Worker registrado con éxito:', registration.scope);
+            }).catch(function(err) {
+              console.log('Registro de Service Worker falló:', err);
+            });
+          });
+        }
     </script>
 </body>
 </html>
