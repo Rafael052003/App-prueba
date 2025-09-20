@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Aplicaciones - Grupo Riba Smith</title>
+    <title>Portal de Aplicaciones</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
 
         body {
             font-family: var(--font-main);
-            background: var(--bg-light);
+            background: linear-gradient(135deg, #f0f4f8, #e6edf2);
             color: var(--primary-color);
             display: flex;
             flex-direction: column;
@@ -66,25 +66,30 @@
         .app-card {
             background-color: #ffffff;
             border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             padding: 30px 20px;
             text-decoration: none;
             color: var(--primary-color);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
         .app-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .app-card:hover .app-icon {
+            color: #2980b9;
         }
 
         .app-icon {
             font-size: 48px;
             color: var(--accent-color);
             margin-bottom: 15px;
+            transition: color 0.3s ease;
         }
 
         .app-title {
@@ -98,10 +103,22 @@
             color: var(--secondary-color);
             line-height: 1.4;
         }
+
+        .logo-container {
+            margin-bottom: 20px;
+        }
+
+        .logo-container img {
+            width: 80px; /* Ajusta el tamaño de tu logo */
+            height: auto;
+        }
     </style>
 </head>
 <body>
     <div class="header-container">
+        <div class="logo-container">
+            <img src="icon-192.png" alt="Logo de la Empresa">
+        </div>
         <h1>PORTAL DE APLICACIONES</h1>
         <h2>GRUPO RIBA SMITH</h2>
     </div>
