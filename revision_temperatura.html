@@ -89,9 +89,9 @@
 
         /* Header & Titles */
         header { text-align: center; margin-bottom: 40px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); position: relative; }
-        .title-group h1 { font-size: 30px; font-weight: 700; color: var(--primary-color); text-transform: uppercase; margin: 0; }
-        .title-group h2 { font-size: 20px; font-weight: 500; color: var(--secondary-color); margin: 5px 0 0; }
-        #main-title { font-size: 24px; font-weight: 600; margin-top: 15px; }
+        .title-group h1 { font-size: 24px; font-weight: 700; color: var(--primary-color); text-transform: uppercase; margin: 0; }
+        .title-group h2 { font-size: 16px; font-weight: 500; color: var(--secondary-color); margin: 5px 0 0; }
+        #main-title { font-size: 20px; font-weight: 600; margin-top: 15px; }
 
         .hamburger-menu {
             display: none;
@@ -380,8 +380,7 @@
         <img src="icon-191.png" alt="Logo">
         <h2>REVISIÓN Y</h2>
         <h2>TEMPERATURA</h2>
-        <p>Powered by</p>
-        <p>Rafael Ramos</p>
+        <p>Powered by Rafael Ramos</p>
         <p>Versión 1.0</p>
     </div>
 
@@ -542,11 +541,15 @@
             const DEFAULT_SECCIONES = ['TEMPERATURAS', 'REVISIONES'];
             const STORAGE_KEY_TEMPERATURAS = 'data_temperaturas';
             const STORAGE_KEY_REVISIONES = 'data_revisiones';
+            const STORAGE_KEY_VESPERTINO = 'vespertino_nombre'; // Nueva clave para el nombre vespertino
+            const STORAGE_KEY_NOCTURNO = 'nocturno_nombre'; // Nueva clave para el nombre nocturno
             
             let dataTemperaturas = JSON.parse(localStorage.getItem(STORAGE_KEY_TEMPERATURAS));
             let dataRevisiones = JSON.parse(localStorage.getItem(STORAGE_KEY_REVISIONES));
 
             const reviewDateInput = document.getElementById('review-date');
+            const vespertinoNombreInput = document.getElementById('vespertino-nombre'); // Se obtiene el campo
+            const nocturnoNombreInput = document.getElementById('nocturno-nombre'); // Se obtiene el campo
 
             const initialTemperaturesData = [
                 { temp: '-20°', nevera: 'NEVERA DE HIELOS' }, { temp: '-23°', nevera: 'HELADERIA 1' },
@@ -609,6 +612,9 @@
                 saveTimer = setTimeout(() => {
                     localStorage.setItem(STORAGE_KEY_TEMPERATURAS, JSON.stringify(dataTemperaturas));
                     localStorage.setItem(STORAGE_KEY_REVISIONES, JSON.stringify(dataRevisiones));
+                    // Nuevo: Guarda los nombres de las revisiones
+                    localStorage.setItem(STORAGE_KEY_VESPERTINO, vespertinoNombreInput.value);
+                    localStorage.setItem(STORAGE_KEY_NOCTURNO, nocturnoNombreInput.value);
                 }, 300);
             }
 
@@ -722,6 +728,11 @@
                 } else {
                     dataRevisiones = dataRevisiones.map(item => ({ ...item, rev1: '', obs1: '', rev2: '', obs2: '', rev3: '', obs3: '' }));
                 }
+                // Nuevo: Borra los nombres de los campos
+                vespertinoNombreInput.value = '';
+                nocturnoNombreInput.value = '';
+                localStorage.removeItem(STORAGE_KEY_VESPERTINO);
+                localStorage.removeItem(STORAGE_KEY_NOCTURNO);
                 saveAndNotify();
                 render();
                 clearModal.style.display = 'none';
@@ -907,7 +918,20 @@
                 if (!reviewDateInput.value) {
                     reviewDateInput.value = getTodayDateFormattedForInput();
                 }
+                // Nuevo: Cargar los nombres guardados del localStorage
+                const vespertinoNombreGuardado = localStorage.getItem(STORAGE_KEY_VESPERTINO);
+                if (vespertinoNombreGuardado) {
+                    vespertinoNombreInput.value = vespertinoNombreGuardado;
+                }
+                const nocturnoNombreGuardado = localStorage.getItem(STORAGE_KEY_NOCTURNO);
+                if (nocturnoNombreGuardado) {
+                    nocturnoNombreInput.value = nocturnoNombreGuardado;
+                }
                 render();
+
+                // Nuevo: Escuchar los cambios en los campos de nombre para guardar automáticamente
+                vespertinoNombreInput.addEventListener('input', saveAndNotify);
+                nocturnoNombreInput.addEventListener('input', saveAndNotify);
             });
         })();
     </script>
