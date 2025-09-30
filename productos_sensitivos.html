@@ -292,26 +292,7 @@
             color: #9ca3af;
         }
 
-        /* Print Styles */
-        @media print {
-            body { padding: 0; font-family: 'Poppins', sans-serif; font-size: 12pt; }
-            .main-content, header, .controls, .chips, .actions, .toast-container, .side-menu, .overlay, .modal, .footer { display: none; }
-            .printable-content { display: block !important; padding: 0; }
-            .pdf-header { text-align: center; margin-bottom: 20px; }
-            .pdf-header h1 { font-size: 20pt; margin: 2px 0; font-weight: 700; text-transform: uppercase; }
-            .pdf-header p { font-size: 16pt; font-weight: bold; margin-top: 5px; text-align: center; }
-            .pdf-section-title { text-align: center; font-size: 16pt; font-weight: 700; margin-top: 20px; text-transform: uppercase;}
-            table { border-collapse: collapse; margin-top: 10px; font-size: 12pt; table-layout: fixed; margin-left: auto; margin-right: auto; width: 90%; margin-bottom: 50px; }
-            table:last-of-type { margin-bottom: 20px; }
-            th, td { border: 1px solid #333; padding: 8px; text-align: center; }
-            th { background: #f0f0f0; font-weight: bold; }
-            .increased { background-color: #d4edda !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .decreased { background-color: #f8d7da !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .pdf-footer { text-align: center; font-size: 16pt; font-weight: bold; color: #666; margin-top: 20px; position: relative; }
-            .pdf-section-container { page-break-after: always; }
-            .pdf-section-container:last-of-type { page-break-after: avoid; }
-            .print-btn { display:none; }
-        }
+        /* Print Styles - Eliminados para no interferir con jsPDF */
     </style>
 </head>
 <body>
@@ -451,6 +432,9 @@
         </div>
         <p>© 2025 Rafael Ramos. Todos los derechos reservados.</p>
     </footer>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
@@ -725,134 +709,178 @@
                 if (event.target === privacyModal) privacyModal.style.display = 'none';
             };
 
-            function getPdfCellClass(currentValue, prevValue, isFirstColumn) {
-                const numCurrent = parseFloat(currentValue);
-                const numPrev = parseFloat(prevValue);
-                if (isFirstColumn) return '';
-                if (!isNaN(numCurrent) && !isNaN(numPrev)) {
-                    if (numCurrent < numPrev) return 'decreased';
-                    if (numCurrent > numPrev) return 'increased';
-                }
-                return '';
-            }
-
-            // MODIFICACIÓN: Nueva función para generar y descargar el PDF de forma directa.
+            // ***************************************************************
+            // ************ FUNCIÓN DE EXPORTACIÓN CON jsPDF.autoTable() *****
+            // ***************************************************************
             btnExport.onclick = () => {
-                if (!productos.length) {
-                    showToast('No hay productos para exportar.', 'warning');
+                // Filtra para exportar solo las filas que tienen al menos un horario registrado
+                const exportableProducts = productos.filter(p => p.t0700 || p.t1200 || p.t1500 || p.t2200);
+
+                if (!exportableProducts.length) {
+                    showToast('No hay datos con horarios registrados para exportar.', 'warning');
                     return;
                 }
 
-                const secciones = DEFAULT_SECCIONES;
-                let contentHtml = '';
-                const reviewDateValue = reviewDateInput.value;
-                let formattedReviewDate;
-                if (reviewDateValue) {
-                    const [y, m, d] = reviewDateValue.split('-');
-                    formattedReviewDate = `${d}/${m}/${y}`;
-                } else {
-                    formattedReviewDate = 'N/A';
+                if (typeof window.jspdf === 'undefined' || typeof window.jspdf.AcroForm === 'undefined') {
+                    showToast('Error: Librería de jsPDF o AutoTable no cargada. Intente recargar.', 'error', 4000);
+                    return;
                 }
 
-                secciones.forEach((sec) => {
-                    const rows = productos.filter(p => p.seccion === sec);
-                    if (rows.length) {
-                        contentHtml += `<div class="pdf-section-container">`;
-                        contentHtml += `<div class="pdf-section-title">${sec}</div>`;
-                        contentHtml += `<table><thead><tr><th>PRECIO</th><th class="product-sensitive-header">PRODUCTO<br>SENSITIVO</th><th>07:00</th><th>12:00</th><th>15:00</th><th>22:00</th></tr></thead><tbody>`;
-                        rows.forEach(r => {
-                            let t0700_val = r.t0700 || '';
-                            let t1200_val = r.t1200 || '';
-                            let t1500_val = r.t1500 || '';
-                            let t2200_val = r.t2200 || '';
-                            let class0700 = getPdfCellClass(t0700_val, '', true);
-                            let class1200 = getPdfCellClass(t1200_val, t0700_val, false);
-                            let class1500 = getPdfCellClass(t1500_val, t1200_val, false);
-                            let class2200 = getPdfCellClass(t2200_val, t1500_val, false);
-                            contentHtml += `<tr>
-                                <td>${r.precio || ''}</td>
-                                <td class="product-sensitive-header" style="text-align: left;">${r.nombre || ''}</td>
-                                <td class="${class0700}">${t0700_val}</td>
-                                <td class="${class1200}">${t1200_val}</td>
-                                <td class="${class1500}">${t1500_val}</td>
-                                <td class="${class2200}">${t2200_val}</td>
-                            </tr>`;
+                showToast('Generando PDF... por favor espere.', 'warning'); // Toast de carga
+                
+                setTimeout(() => { 
+                    try {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF('p', 'mm', 'a4'); 
+                        const marginX = 15;
+                        const pageHeight = doc.internal.pageSize.height;
+                        const PDF_MAIN_TITLE = "LISTADO DE PRODUCTOS SENSITIVOS";
+                        const secciones = DEFAULT_SECCIONES;
+                        
+                        const reviewDateValue = reviewDateInput.value;
+                        let formattedReviewDate = 'N/A';
+                        if (reviewDateValue) {
+                            const [y, m, d] = reviewDateValue.split('-');
+                            formattedReviewDate = `${d}/${m}/${y}`;
+                        } else {
+                            const today = new Date();
+                            formattedReviewDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+                        }
+                        
+                        let currentY = 15;
+
+                        // Función para dibujar encabezado y pie de página
+                        const addHeader = (doc, startY) => {
+                            doc.setFontSize(16).setFont('Poppins', 'bold');
+                            doc.text("GRUPO RIBA SMITH", doc.internal.pageSize.width / 2, startY, { align: 'center' });
+                            startY += 6;
+                            doc.setFontSize(12).setFont('Poppins', 'normal');
+                            doc.text("R/S CHITRÉ SELECTO", doc.internal.pageSize.width / 2, startY, { align: 'center' });
+                            startY += 5;
+                            doc.setFontSize(12).setFont('Poppins', 'bold');
+                            doc.text(PDF_MAIN_TITLE, doc.internal.pageSize.width / 2, startY, { align: 'center' });
+                            startY += 6;
+                            doc.setFontSize(10).setFont('Poppins', 'normal');
+                            doc.text(`Fecha de Revisión: ${formattedReviewDate}`, doc.internal.pageSize.width / 2, startY, { align: 'center' });
+                            startY += 8;
+                            
+                            // Pie de página (se actualiza en didDrawPage)
+                            doc.setFontSize(8).setFont('Poppins', 'normal');
+                            doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
+                            doc.text('Powered by Rafael Ramos', doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
+
+                            return startY;
+                        };
+                        
+                        currentY = addHeader(doc, currentY);
+
+                        let firstTable = true; 
+
+                        secciones.forEach((sec) => {
+                            const rows = exportableProducts.filter(p => p.seccion === sec);
+                            
+                            if (rows.length > 0) {
+                                
+                                if (!firstTable) {
+                                    doc.addPage();
+                                    currentY = addHeader(doc, 15);
+                                } else {
+                                    firstTable = false;
+                                }
+
+                                // Título de la sección
+                                doc.setFontSize(11).setFont('Poppins', 'bold');
+                                doc.text(sec, doc.internal.pageSize.width / 2, currentY, { align: 'center' });
+                                currentY += 5;
+
+                                const tableBody = rows.map(r => [
+                                    r.precio || '', 
+                                    r.nombre || '', 
+                                    r.t0700 || '', 
+                                    r.t1200 || '', 
+                                    r.t1500 || '', 
+                                    r.t2200 || ''
+                                ]);
+
+                                const tableHeaders = [['PRECIO', 'PRODUCTO SENSITIVO', '07:00', '12:00', '15:00', '22:00']];
+
+                                doc.autoTable({
+                                    startY: currentY,
+                                    head: tableHeaders,
+                                    body: tableBody,
+                                    theme: 'grid',
+                                    styles: { fontSize: 8, cellPadding: 2, halign: 'center' },
+                                    headStyles: { fillColor: [17, 24, 39], textColor: [255, 255, 255], fontStyle: 'bold' },
+                                    columnStyles: {
+                                        0: { cellWidth: 20 },
+                                        1: { cellWidth: 50, halign: 'left' },
+                                        2: { cellWidth: 25 },
+                                        3: { cellWidth: 25 },
+                                        4: { cellWidth: 25 },
+                                        5: { cellWidth: 25 },
+                                    },
+                                    tableWidth: 'wrap',
+                                    margin: { left: marginX, right: marginX, top: 15, bottom: 15 },
+                                    didDrawCell: (data) => {
+                                        if (data.section === 'body') {
+                                            const cellContent = data.cell.text.join('');
+                                            const colIndex = data.column.index;
+                                            const rowIndex = data.row.index;
+                                            
+                                            // Obtener valores previos
+                                            let prevValue = null;
+                                            if (colIndex === 3) { // 12:00
+                                                prevValue = rows[rowIndex]['t0700'];
+                                            } else if (colIndex === 4) { // 15:00
+                                                prevValue = rows[rowIndex]['t1200'];
+                                            } else if (colIndex === 5) { // 22:00
+                                                prevValue = rows[rowIndex]['t1500'];
+                                            }
+                                            
+                                            const numCurrent = parseFloat(cellContent);
+                                            const numPrev = parseFloat(prevValue);
+
+                                            // Colorear celdas basadas en la diferencia con la columna anterior
+                                            if (colIndex >= 3 && !isNaN(numCurrent) && !isNaN(numPrev)) {
+                                                if (numCurrent < numPrev) {
+                                                    doc.setFillColor(248, 215, 218); // F8D7DA (decreased - Red)
+                                                    doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, 'F');
+                                                } else if (numCurrent > numPrev) {
+                                                    doc.setFillColor(212, 237, 218); // D4EDDA (increased - Green)
+                                                    doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, 'F');
+                                                }
+                                            }
+                                        }
+                                    },
+                                    didDrawPage: (data) => {
+                                        // Vuelve a dibujar encabezado y pie en cada nueva página de la tabla
+                                        if(data.pageNumber > 1) { 
+                                            doc.setFontSize(8).setFont('Poppins', 'normal');
+                                            doc.text('Powered by Rafael Ramos', doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
+                                            doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
+                                        }
+                                    }
+                                });
+                                currentY = doc.autoTable.previous.finalY;
+                            }
                         });
-                        contentHtml += `</tbody></table>`;
-                        contentHtml += `</div>`;
+                        
+                        const today = new Date();
+                        const fileNameDate = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`;
+                        doc.save(`Productos_Sensitivos_RS_Chitre_${fileNameDate}.pdf`);
+
+                        // Mostramos el toast de éxito
+                        showToast('¡PDF guardado con éxito!', 'success');
+                        
+                    } catch (e) {
+                        console.error("Error al generar el PDF:", e);
+                        showToast('Error al generar el PDF. Revise la consola.', 'error', 5000);
                     }
-                });
-                
-                const today = new Date();
-                const day = String(today.getDate()).padStart(2, '0');
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const year = today.getFullYear();
-                const formattedDate = `${day}/${month}/${year}`;
-                
-                const fullHtml = `
-                    <html>
-                    <head>
-                        <meta charset='utf-8'>
-                        <title>Productos Sensitivos - ${formattedDate}</title>
-                        <style>
-                            /* Estilos CSS para el PDF */
-                            body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
-                            .printable-content { padding: 40px 30px; }
-                            .pdf-header { text-align: center; margin-bottom: 20px; }
-                            .pdf-header h1 { font-size: 20pt; margin: 2px 0; font-weight: 700; text-transform: uppercase; }
-                            .pdf-header p { font-size: 16pt; font-weight: bold; margin-top: 5px; text-align: center; }
-                            .pdf-section-title { text-align: center; font-size: 16pt; font-weight: 700; margin-top: 20px; text-transform: uppercase;}
-                            table { border-collapse: collapse; margin-top: 10px; font-size: 12pt; table-layout: fixed; margin-left: auto; margin-right: auto; width: 90%; margin-bottom: 50px; }
-                            table:last-of-type { margin-bottom: 20px; }
-                            th, td { border: 1px solid #333; padding: 8px; text-align: center; }
-                            th { background: #f0f0f0; font-weight: bold; }
-                            .increased { background-color: #d4edda !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                            .decreased { background-color: #f8d7da !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                            .pdf-footer { text-align: center; font-size: 16pt; font-weight: bold; color: #666; margin-top: 20px; position: relative; }
-                            .pdf-section-container { page-break-after: always; }
-                            .pdf-section-container:last-of-type { page-break-after: avoid; }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="printable-content">
-                            <div class="pdf-header">
-                                <h1>GRUPO RIBA SMITH</h1>
-                                <h1>R/S CHITRÉ SELECTO</h1>
-                                <h1>LISTADO DE PRODUCTOS SENSITIVOS</h1>
-                                <p>Fecha de Revisión: ${formattedReviewDate}</p>
-                            </div>
-                            ${contentHtml}
-                            <div class="pdf-footer">Powered by Rafael Ramos</div>
-                        </div>
-                    </body>
-                    </html>`;
-
-                // Crear un Blob y un link temporal para forzar la descarga
-                const blob = new Blob([fullHtml], { type: 'text/html' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                
-                // Nombre del archivo de descarga
-                a.download = `Productos_Sensitivos_${formattedDate.replace(/\//g, '-')}.html`;
-
-                // Intentar usar un método de descarga más directo para forzar el PDF o HTML
-                // Nota: Los navegadores en móviles (como Chrome en Android) a menudo convierten el HTML a PDF
-                // en el diálogo de "Imprimir", o lo guardan como HTML. Dejaremos la extensión .html para compatibilidad.
-                // En el mundo web, forzar un PDF directo sin un backend es complejo. 
-                // La solución más robusta y compatible para *forzar una descarga* sin abrir el diálogo de impresión
-                // es guardarlo como HTML/MHTML, o usar una librería de terceros (como jsPDF), pero esta solución
-                // mantiene la simplicidad de tu código actual.
-
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                // Mostrar el toast de éxito de descarga
-                showToast('¡PDF generado y descargado exitosamente!', 'success');
+                }, 100);
             };
-            // FIN MODIFICACIÓN
+            // ***************************************************************
+            // ************ FIN DE FUNCIÓN CON jsPDF.autoTable() *************
+            // ***************************************************************
 
             const handleExportJson = () => {
                 if (!productos.length) {
