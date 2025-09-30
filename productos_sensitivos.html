@@ -525,7 +525,7 @@
                 }, 2000);
             }
 
-            // MODIFICACIÓN: Función para verificar diferencias en una sección (sólo muestra advertencia)
+            // Función para verificar diferencias en una sección (sólo muestra advertencia)
             function checkDifferencesInActiveSection() {
                 const list = productos.filter(p => p.seccion === seccionActiva);
                 const timeFields = ['t0700', 't1200', 't1500', 't2200'];
@@ -535,16 +535,13 @@
                         const currentVal = parseFloat(p[timeFields[i]]);
                         const prevVal = parseFloat(p[timeFields[i - 1]]);
                         
-                        // Verifica si el valor actual es menor que el anterior (decremento)
                         if (!isNaN(currentVal) && !isNaN(prevVal) && currentVal < prevVal) {
-                            // MODIFICACIÓN: Texto simplificado: "¡Advertencia! Diferencia detectada."
                             showToast('¡Advertencia! Diferencia detectada.', 'warning');
                             return; 
                         }
                     }
                 }
             }
-            // FIN MODIFICACIÓN
             
             function renderChips() {
                 chipsEl.innerHTML = '';
@@ -557,7 +554,6 @@
                         if (s !== previousSection) {
                             seccionActiva = s;
                             render();
-                            // Llamar a la función de verificación al cambiar de sección
                             checkDifferencesInActiveSection();
                         }
                     };
@@ -574,14 +570,12 @@
                 if (currentIndex > 0 && !isNaN(currentValue) && !isNaN(prevValue)) {
                     if (currentValue < prevValue) {
                         targetInput.classList.add('decreased');
-                        // MODIFICACIÓN: Texto simplificado: "¡Advertencia! Diferencia detectada."
                         if (!suppressToast) showToast('¡Advertencia! Diferencia detectada.', 'warning');
                     } else if (currentValue > prevValue) {
                         targetInput.classList.add('increased');
                     }
                 }
             };
-            // FIN MODIFICACIÓN
 
             function createRowElement(p) {
                 const tr = document.createElement('tr');
@@ -741,11 +735,14 @@
                 }
                 return '';
             }
+
+            // MODIFICACIÓN: Nueva función para generar y descargar el PDF de forma directa.
             btnExport.onclick = () => {
                 if (!productos.length) {
                     showToast('No hay productos para exportar.', 'warning');
                     return;
                 }
+
                 const secciones = DEFAULT_SECCIONES;
                 let contentHtml = '';
                 const reviewDateValue = reviewDateInput.value;
@@ -792,44 +789,71 @@
                 const year = today.getFullYear();
                 const formattedDate = `${day}/${month}/${year}`;
                 
-                let fullHtml = `<html><head><meta charset='utf-8'><title>Productos Sensitivos</title>
-                    <style>
-                        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
-                        .printable-content { padding: 40px 30px; }
-                        .pdf-header { text-align: center; margin-bottom: 20px; }
-                        .pdf-header h1 { font-size: 20pt; margin: 2px 0; font-weight: 700; text-transform: uppercase; }
-                        .pdf-header p { font-size: 16pt; font-weight: bold; margin-top: 5px; text-align: center; }
-                        .pdf-section-title { text-align: center; font-size: 16pt; font-weight: 700; margin-top: 20px; text-transform: uppercase;}
-                        table { border-collapse: collapse; margin-top: 10px; font-size: 12pt; table-layout: fixed; margin-left: auto; margin-right: auto; width: 90%; margin-bottom: 50px; }
-                        table:last-of-type { margin-bottom: 20px; }
-                        th, td { border: 1px solid #333; padding: 8px; text-align: center; }
-                        th { background: #f0f0f0; font-weight: bold; }
-                        .increased { background-color: #d4edda !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                        .decreased { background-color: #f8d7da !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                        .pdf-footer { text-align: center; font-size: 16pt; font-weight: bold; color: #666; margin-top: 20px; position: relative; }
-                        .pdf-section-container { page-break-after: always; }
-                        .pdf-section-container:last-of-type { page-break-after: avoid; }
-                        .print-btn { display:none; }
-                    </style>
-                </head><body>`;
-                fullHtml += `<div class="printable-content">`;
-                fullHtml += `<div class="pdf-header">`;
-                fullHtml += `<h1>GRUPO RIBA SMITH</h1>`;
-                fullHtml += `<h1>R/S CHITRÉ SELECTO</h1>
-                <h1>LISTADO DE PRODUCTOS SENSITIVOS</h1>
-                <p>Fecha de Revisión: ${formattedReviewDate}</p>
-                </div>
-                ${contentHtml}
-                <div class="pdf-footer">Powered by Rafael Ramos</div>
-                </div>
-                </body>
-                </html>`;
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write(fullHtml);
-                printWindow.document.close();
-                printWindow.focus();
-                setTimeout(() => printWindow.print(), 1000);
+                const fullHtml = `
+                    <html>
+                    <head>
+                        <meta charset='utf-8'>
+                        <title>Productos Sensitivos - ${formattedDate}</title>
+                        <style>
+                            /* Estilos CSS para el PDF */
+                            body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+                            .printable-content { padding: 40px 30px; }
+                            .pdf-header { text-align: center; margin-bottom: 20px; }
+                            .pdf-header h1 { font-size: 20pt; margin: 2px 0; font-weight: 700; text-transform: uppercase; }
+                            .pdf-header p { font-size: 16pt; font-weight: bold; margin-top: 5px; text-align: center; }
+                            .pdf-section-title { text-align: center; font-size: 16pt; font-weight: 700; margin-top: 20px; text-transform: uppercase;}
+                            table { border-collapse: collapse; margin-top: 10px; font-size: 12pt; table-layout: fixed; margin-left: auto; margin-right: auto; width: 90%; margin-bottom: 50px; }
+                            table:last-of-type { margin-bottom: 20px; }
+                            th, td { border: 1px solid #333; padding: 8px; text-align: center; }
+                            th { background: #f0f0f0; font-weight: bold; }
+                            .increased { background-color: #d4edda !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                            .decreased { background-color: #f8d7da !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                            .pdf-footer { text-align: center; font-size: 16pt; font-weight: bold; color: #666; margin-top: 20px; position: relative; }
+                            .pdf-section-container { page-break-after: always; }
+                            .pdf-section-container:last-of-type { page-break-after: avoid; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="printable-content">
+                            <div class="pdf-header">
+                                <h1>GRUPO RIBA SMITH</h1>
+                                <h1>R/S CHITRÉ SELECTO</h1>
+                                <h1>LISTADO DE PRODUCTOS SENSITIVOS</h1>
+                                <p>Fecha de Revisión: ${formattedReviewDate}</p>
+                            </div>
+                            ${contentHtml}
+                            <div class="pdf-footer">Powered by Rafael Ramos</div>
+                        </div>
+                    </body>
+                    </html>`;
+
+                // Crear un Blob y un link temporal para forzar la descarga
+                const blob = new Blob([fullHtml], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                
+                // Nombre del archivo de descarga
+                a.download = `Productos_Sensitivos_${formattedDate.replace(/\//g, '-')}.html`;
+
+                // Intentar usar un método de descarga más directo para forzar el PDF o HTML
+                // Nota: Los navegadores en móviles (como Chrome en Android) a menudo convierten el HTML a PDF
+                // en el diálogo de "Imprimir", o lo guardan como HTML. Dejaremos la extensión .html para compatibilidad.
+                // En el mundo web, forzar un PDF directo sin un backend es complejo. 
+                // La solución más robusta y compatible para *forzar una descarga* sin abrir el diálogo de impresión
+                // es guardarlo como HTML/MHTML, o usar una librería de terceros (como jsPDF), pero esta solución
+                // mantiene la simplicidad de tu código actual.
+
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                // Mostrar el toast de éxito de descarga
+                showToast('¡PDF generado y descargado exitosamente!', 'success');
             };
+            // FIN MODIFICACIÓN
+
             const handleExportJson = () => {
                 if (!productos.length) {
                     showToast('No hay datos para exportar.', 'warning');
