@@ -396,7 +396,7 @@
                 <li><strong>Precisión de la Información:</strong> Usted es responsable de garantizar que la información que ingresa sea veraz, precisa y completa. Cualquier registro falso, inexacto o incompleto es de su única responsabilidad y podría ser sujeto a medidas disciplinarias.</li>
                 <li><strong>Propiedad Intelectual:</strong> La aplicación, incluyendo su código fuente, diseño, interfaz y contenido, es propiedad intelectual de Rafael Ramos y se prohíbe su copia, distribución o modificación sin autorización expresa.</li>
                 <li><strong>Limitación de Responsabilidad:</strong> Rafael Ramos no se hace responsable por daños directos o indirectos, pérdidas o inconvenientes que surjan del uso o la imposibilidad de usar esta aplicación, incluyendo fallas técnicas o errores humanos.</li>
-                <li><strong>Modificaciones a los Términos:</strong> Nos reservamos el derecho de actualizar, modificar o reemplazar estos términos y condiciones en cualquier momento. El uso continuado de la aplicación después de cualquier modificación constituye su aceptación de los nuevos términos.</li>
+                <li><strong>Modificaciones a los Términos:</strong> Reservamos el derecho de actualizar, modificar o reemplazar estos términos y condiciones en cualquier momento. El uso continuado de la aplicación después de cualquier modificación constituye su aceptación de los nuevos términos.</li>
             </ul>
         </div>
     </div>
@@ -418,7 +418,7 @@
                 <strong>Protección de Datos:</strong> Se toman medidas de seguridad para proteger los datos contra el acceso no autorizado. Los datos se almacenan de forma local en el dispositivo del usuario para garantizar la confidencialidad.
             </p>
             <p>
-                <strong>Cambios en la Política:</strong> Nos reservamos el derecho de modificar esta Política de Privacidad. Se notificará a los usuarios sobre cualquier cambio a través de la propia aplicación.
+                <strong>Cambios en la Política:</strong> Reservamos el derecho de modificar esta Política de Privacidad. Se notificará a los usuarios sobre cualquier cambio a través de la propia aplicación.
             </p>
         </div>
     </div>
@@ -436,9 +436,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
     <script>
+        // ***************************************************************
+        // ******* CORRECCIÓN 1: RUTA DEL SERVICE WORKER PARA GITHUB PAGES *
+        // ***************************************************************
+        // ⚠️ DEBES CAMBIAR 'NOMBRE_DEL_REPOSITORIO' por el nombre real de tu repo (ej: 'productos-sensitivos')
+        const BASE_PATH = '/App-prueba/'; 
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
+                // Se usa la ruta base para registrar el service worker correctamente
+                navigator.serviceWorker.register(BASE_PATH + 'service-worker.js')
                     .then(registration => {
                         console.log('Service Worker registrado con éxito:', registration);
                     })
@@ -709,10 +716,10 @@
             };
 
             // ***************************************************************
-            // ************ FUNCIÓN DE EXPORTACIÓN CON jsPDF.autoTable() *****
+            // ******* FUNCIÓN DE EXPORTACIÓN CON jsPDF.autoTable() **********
+            // ******* CORRECCIÓN 2: Uso de 'Helvetica' para evitar error de fuente *
             // ***************************************************************
             btnExport.onclick = () => {
-                // Filtra para exportar solo las filas que tienen al menos un horario registrado
                 const exportableProducts = productos.filter(p => p.t0700 || p.t1200 || p.t1500 || p.t2200);
 
                 if (!exportableProducts.length) {
@@ -725,7 +732,7 @@
                     return;
                 }
 
-                showToast('Generando PDF... por favor espere.', 'warning'); // Toast de carga
+                showToast('Generando PDF... por favor espere.', 'warning');
                 
                 setTimeout(() => { 
                     try {
@@ -750,25 +757,25 @@
 
                         // Función para dibujar encabezado y pie de página
                         const addHeader = (doc, startY) => {
-                            // CORRECCIÓN: Usar 'Helvetica' para evitar el error de fuente
+                            // Usando 'Helvetica'
                             doc.setFontSize(16).setFont('Helvetica', 'bold');
                             doc.text("GRUPO RIBA SMITH", doc.internal.pageSize.width / 2, startY, { align: 'center' });
                             startY += 6;
-                            // CORRECCIÓN: Usar 'Helvetica'
+                            // Usando 'Helvetica'
                             doc.setFontSize(12).setFont('Helvetica', 'normal');
                             doc.text("R/S CHITRÉ SELECTO", doc.internal.pageSize.width / 2, startY, { align: 'center' });
                             startY += 5;
-                            // CORRECCIÓN: Usar 'Helvetica'
+                            // Usando 'Helvetica'
                             doc.setFontSize(12).setFont('Helvetica', 'bold');
                             doc.text(PDF_MAIN_TITLE, doc.internal.pageSize.width / 2, startY, { align: 'center' });
                             startY += 6;
-                            // CORRECCIÓN: Usar 'Helvetica'
+                            // Usando 'Helvetica'
                             doc.setFontSize(10).setFont('Helvetica', 'normal');
                             doc.text(`Fecha de Revisión: ${formattedReviewDate}`, doc.internal.pageSize.width / 2, startY, { align: 'center' });
                             startY += 8;
                             
-                            // Pie de página (se actualiza en didDrawPage)
-                            // CORRECCIÓN: Usar 'Helvetica'
+                            // Pie de página
+                            // Usando 'Helvetica'
                             doc.setFontSize(8).setFont('Helvetica', 'normal');
                             doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
                             doc.text('Powered by Rafael Ramos', doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
@@ -793,7 +800,7 @@
                                 }
 
                                 // Título de la sección
-                                // CORRECCIÓN: Usar 'Helvetica'
+                                // Usando 'Helvetica'
                                 doc.setFontSize(11).setFont('Helvetica', 'bold');
                                 doc.text(sec, doc.internal.pageSize.width / 2, currentY, { align: 'center' });
                                 currentY += 5;
@@ -814,9 +821,9 @@
                                     head: tableHeaders,
                                     body: tableBody,
                                     theme: 'grid',
-                                    // CORRECCIÓN: Especificar fuente del cuerpo como 'helvetica'
+                                    // Especificar fuente del cuerpo como 'helvetica'
                                     styles: { fontSize: 8, cellPadding: 2, halign: 'center', font: 'helvetica' }, 
-                                    // CORRECCIÓN: Especificar fuente del encabezado como 'helvetica'
+                                    // Especificar fuente del encabezado como 'helvetica'
                                     headStyles: { fillColor: [17, 24, 39], textColor: [255, 255, 255], fontStyle: 'bold', font: 'helvetica' },
                                     columnStyles: {
                                         0: { cellWidth: 20 },
@@ -860,9 +867,8 @@
                                         }
                                     },
                                     didDrawPage: (data) => {
-                                        // Vuelve a dibujar encabezado y pie en cada nueva página de la tabla
                                         if(data.pageNumber > 1) { 
-                                            // CORRECCIÓN: Usar 'Helvetica'
+                                            // Usando 'Helvetica'
                                             doc.setFontSize(8).setFont('Helvetica', 'normal');
                                             doc.text('Powered by Rafael Ramos', doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
                                             doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
@@ -877,7 +883,6 @@
                         const fileNameDate = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`;
                         doc.save(`Productos_Sensitivos_RS_Chitre_${fileNameDate}.pdf`);
 
-                        // Mostramos el toast de éxito
                         showToast('¡PDF guardado con éxito!', 'success');
                         
                     } catch (e) {
@@ -958,13 +963,14 @@
                 setTimeout(() => { document.getElementById("splash").style.opacity = "0"; }, 1500);
                 setTimeout(() => { document.getElementById("splash").style.display = "none"; }, 2000);
                 
-                // CORRECCIÓN: Inicializar el valor de la fecha al cargar para evitar el error 'undefined'
+                // ***************************************************************
+                // ******* CORRECCIÓN 3: Inicialización de la fecha al cargar *******
+                // ***************************************************************
                 if (!reviewDateInput.value) {
                     reviewDateInput.value = getTodayDateFormattedForInput();
                 }
 
                 render();
-                // Llamar a la función de verificación al cargar por primera vez
                 checkDifferencesInActiveSection();
             });
         })();
