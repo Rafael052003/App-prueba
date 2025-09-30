@@ -524,6 +524,28 @@
                     setTimeout(() => t.remove(), 500);
                 }, 2000);
             }
+
+            // MODIFICACIÓN: Función para verificar diferencias en una sección (sólo muestra advertencia)
+            function checkDifferencesInActiveSection() {
+                const list = productos.filter(p => p.seccion === seccionActiva);
+                const timeFields = ['t0700', 't1200', 't1500', 't2200'];
+                
+                for (const p of list) {
+                    for (let i = 1; i < timeFields.length; i++) {
+                        const currentVal = parseFloat(p[timeFields[i]]);
+                        const prevVal = parseFloat(p[timeFields[i - 1]]);
+                        
+                        // Verifica si el valor actual es menor que el anterior (decremento)
+                        if (!isNaN(currentVal) && !isNaN(prevVal) && currentVal < prevVal) {
+                            // MODIFICACIÓN: Texto simplificado: "¡Advertencia! Diferencia detectada."
+                            showToast('¡Advertencia! Diferencia detectada.', 'warning');
+                            return; 
+                        }
+                    }
+                }
+            }
+            // FIN MODIFICACIÓN
+            
             function renderChips() {
                 chipsEl.innerHTML = '';
                 DEFAULT_SECCIONES.forEach(s => {
@@ -531,8 +553,13 @@
                     b.className = 'chip' + (s === seccionActiva ? ' active' : '');
                     b.textContent = s;
                     b.onclick = () => {
-                        seccionActiva = s;
-                        render();
+                        const previousSection = seccionActiva;
+                        if (s !== previousSection) {
+                            seccionActiva = s;
+                            render();
+                            // Llamar a la función de verificación al cambiar de sección
+                            checkDifferencesInActiveSection();
+                        }
                     };
                     chipsEl.appendChild(b);
                 });
@@ -547,12 +574,15 @@
                 if (currentIndex > 0 && !isNaN(currentValue) && !isNaN(prevValue)) {
                     if (currentValue < prevValue) {
                         targetInput.classList.add('decreased');
+                        // MODIFICACIÓN: Texto simplificado: "¡Advertencia! Diferencia detectada."
                         if (!suppressToast) showToast('¡Advertencia! Diferencia detectada.', 'warning');
                     } else if (currentValue > prevValue) {
                         targetInput.classList.add('increased');
                     }
                 }
             };
+            // FIN MODIFICACIÓN
+
             function createRowElement(p) {
                 const tr = document.createElement('tr');
                 const tdPrecio = document.createElement('td');
@@ -871,6 +901,8 @@
                     reviewDateInput.value = getTodayDateFormattedForInput();
                 }
                 render();
+                // Llamar a la función de verificación al cargar por primera vez
+                checkDifferencesInActiveSection();
             });
         })();
     </script>
