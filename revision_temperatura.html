@@ -51,7 +51,7 @@
                 padding: 15px;
             }
         }
-
+        
         /* Mobile Specific Adjustments */
         @media (max-width: 600px) {
             .title-group h1 { font-size: 18px; }
@@ -66,7 +66,7 @@
             .hamburger-menu { top: 20px; left: 20px; font-size: 24px; display: block; }
             #splash h2 { font-size: 18px; }
         }
-
+        
         /* Splash Screen */
         #splash {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -188,7 +188,7 @@
         .action-btn.danger:hover { background: #c0392b; }
         .action-btn.success { background: var(--success-color); }
         .action-btn.success:hover { background: #27ae60; }
-
+        
         .chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .chip {
             padding: 10px 20px;
@@ -234,7 +234,7 @@
         td {
             cursor: default;
         }
-
+        
         /* New style for input within editable cells */
         td.editable-input {
             padding: 0;
@@ -259,7 +259,7 @@
         .main-table tbody tr:hover { background-color: #f5f8fb; }
         .main-table tbody tr:last-child td { border-bottom: none; }
         td.left { text-align: left; }
-
+        
         /* Modal */
         .modal { 
             display: none; 
@@ -305,7 +305,7 @@
         .close-btn:hover, .close-btn:focus { color: var(--primary-color); }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes scaleIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
+        
         /* Footer */
         .footer {
             text-align: center;
@@ -539,7 +539,7 @@
             <a href="#" id="openPrivacyModal">Política de Privacidad</a>
         </p>
     </footer>
-
+    
     <button id="btnDefrost" class="action-btn" style="display: none;">DEF</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -562,14 +562,14 @@
                     });
             });
         }
-
+        
         (function () {
             const DEFAULT_SECCIONES = ['TEMPERATURAS', 'REVISIONES'];
             const STORAGE_KEY_TEMPERATURAS = 'data_temperaturas';
             const STORAGE_KEY_REVISIONES = 'data_revisiones';
             const STORAGE_KEY_VESPERTINO = 'vespertino_nombre'; 
             const STORAGE_KEY_NOCTURNO = 'nocturno_nombre'; 
-
+            
             let dataTemperaturas = JSON.parse(localStorage.getItem(STORAGE_KEY_TEMPERATURAS));
             let dataRevisiones = JSON.parse(localStorage.getItem(STORAGE_KEY_REVISIONES));
             let activeInput = null; // Variable para rastrear el campo de entrada activo
@@ -656,7 +656,7 @@
                 const toast = document.createElement('div');
                 toast.className = 'toast';
                 toast.innerHTML = `<i class="${iconClass}"></i> ${message}`;
-
+                
                 toastContainer.prepend(toast); 
 
                 setTimeout(() => { toast.classList.add('show'); }, 10); 
@@ -669,12 +669,12 @@
 
             function showLoadingToast(message) {
                 if (currentToastElement) hideToast(currentToastElement); 
-
+                
                 const toastContainer = document.getElementById('toast-container');
                 const toast = document.createElement('div');
                 toast.className = 'toast loading-toast';
                 toast.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${message}`;
-
+                
                 toastContainer.prepend(toast);
                 currentToastElement = toast;
 
@@ -747,7 +747,7 @@
                         `;
                         tr.querySelectorAll('td.editable-input input').forEach(input => {
                             const parentCell = input.closest('td');
-
+                            
                             // Rastrea el campo activo
                             input.addEventListener('focus', () => {
                                 activeInput = input;
@@ -758,15 +758,15 @@
                                      activeInput = null;
                                 }
                             });
-
+                            
                             function handleInput() {
                                 const value = input.value.trim();
-
+                                
                                 // Lógica para aceptar "DEF"
                                 const isDefrost = value.toUpperCase() === 'DEF';
-
+                                
                                 const isValid = value === '' || isDefrost || validateTemperature(value);
-
+                                
                                 const field = input.dataset.field;
                                 dataToRender[index][field] = value;
                                 saveAndNotify();
@@ -796,7 +796,7 @@
                     tbody.appendChild(tr);
                 });
             }
-
+            
             function renderChips() {
                 chipsEl.innerHTML = '';
                 DEFAULT_SECCIONES.forEach(s => {
@@ -853,7 +853,7 @@
                 e.preventDefault();
                 termsModal.style.display = 'flex';
             };
-
+            
             openPrivacyModalBtn.onclick = (e) => {
                 e.preventDefault();
                 privacyModal.style.display = 'flex';
@@ -890,7 +890,7 @@
 
                         const vespertinoNombre = vespertinoNombreInput.value.trim();
                         const nocturnoNombre = nocturnoNombreInput.value.trim();
-
+                        
                         const reviewDateValue = reviewDateInput.value;
                         let formattedReviewDate = 'N/A';
                         if (reviewDateValue) {
@@ -905,7 +905,7 @@
 
                         const addHeaderAndFooter = (doc) => { 
                             let yPos = 15;
-
+                            
                             if (doc.internal.getNumberOfPages() === 1) {
                                 doc.setFontSize(16).setFont('helvetica', 'bold');
                                 doc.text("GRUPO RIBA SMITH", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
@@ -913,12 +913,12 @@
                                 doc.setFontSize(12).setFont('helvetica', 'normal');
                                 doc.text("R/S CHITRÉ SELECTO", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
                                 yPos += 5;
-
+                                
                                 doc.setFontSize(12).setFont('helvetica', 'bold');
                                 const titleLines = doc.splitTextToSize(PDF_MAIN_TITLE, doc.internal.pageSize.width - marginX * 2);
                                 doc.text(titleLines, doc.internal.pageSize.width / 2, yPos, { align: 'center' });
                                 yPos += (titleLines.length * 5) + 3;
-
+                                
                                 doc.setFontSize(10).setFont('helvetica', 'bold'); 
                                 const detailHeight = 5;
 
@@ -927,28 +927,28 @@
                                 doc.text(`Revisión Nocturna:`, doc.internal.pageSize.width - marginX, yPos, { align: 'right' });
 
                                 yPos += detailHeight - 1; 
-
+                                
                                 doc.setFontSize(10).setFont('helvetica', 'normal'); 
                                 doc.text(formattedReviewDate, marginX, yPos);
                                 doc.text(vespertinoNombre || "________________", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
                                 doc.text(nocturnoNombre || "________________", doc.internal.pageSize.width - marginX, yPos, { align: 'right' });
-
+                                
                                 yPos += detailHeight + 5;
                             }
-
+                            
                             doc.setFontSize(8).setFont('helvetica', 'normal');
                             doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
-
+                            
                             const footerText = 'Powered by Rafael Ramos';
                             doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
-
+                            
                             return (doc.internal.getNumberOfPages() === 1) ? yPos : 15;
                         };
 
                         // --- 2. GENERAR TABLA DE TEMPERATURAS (AJUSTADA) ---
                         if (dataTemperaturas.length) {
                             let currentY = addHeaderAndFooter(doc);
-
+                            
                             const tempHeaders = [
                                 { header: 'TEMP', dataKey: 'temp' },
                                 { header: 'NEVERAS', dataKey: 'nevera' },
@@ -957,7 +957,7 @@
                                 { header: '02:00', dataKey: 't0200' },
                                 { header: '04:00', dataKey: 't0400' },
                             ];
-
+                            
                             const tempBody = dataTemperaturas.map(d => [
                                 d.temp || '', d.nevera || '', d.t2200 || '', d.t0000 || '', d.t0200 || '', d.t0400 || ''
                             ]);
@@ -979,12 +979,12 @@
                                 },
                                 tableWidth: 'wrap', 
                                 margin: { left: marginX, right: marginX, top: 15, bottom: 15 }, 
-
+                                
                                 didDrawPage: (data) => {
                                     doc.setFontSize(8).setFont('helvetica', 'normal');
                                     const footerText = 'Powered by Rafael Ramos';
                                     doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
-
+                                    
                                     if (data.pageNumber > 1) { 
                                         doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
                                         data.cursor.y = 15;
@@ -1002,7 +1002,7 @@
                             } else {
                                 let currentY = addHeaderAndFooter(doc);
                             }
-
+                            
                             const revHeaders = [
                                 { header: 'PUERTAS Y/O ÁREAS', dataKey: 'area' },
                                 { header: 'REV. N°1', dataKey: 'rev1' },
@@ -1012,13 +1012,13 @@
                                 { header: 'REV. N°3', dataKey: 'rev3' },
                                 { header: 'OBSERVACIÓN', dataKey: 'obs3' },
                             ];
-
+                            
                             const revBody = dataRevisiones.map(d => [
                                 d.area || '', d.rev1 || '', d.obs1 || '', d.rev2 || '', d.obs2 || '', d.rev3 || '', d.obs3 || ''
                             ]);
-
+                            
                             let revPageCount = 0; 
-
+                            
                             doc.autoTable({
                                 startY: doc.autoTable.previous.finalY > 0 ? doc.autoTable.previous.finalY + 5 : 20,
                                 head: [revHeaders.map(h => h.header)],
@@ -1038,13 +1038,13 @@
                                 },
                                 tableWidth: 'wrap', 
                                 margin: { left: marginX, right: marginX, top: 15, bottom: 15 },
-
+                                
                                 didDrawPage: (data) => {
                                     revPageCount++; 
                                     doc.setFontSize(8).setFont('helvetica', 'normal');
                                     const footerText = 'Powered by Rafael Ramos';
                                     doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
-
+                                    
                                     if (revPageCount > 1) {
                                         doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
                                         data.cursor.y = 15; 
@@ -1052,7 +1052,7 @@
                                 }
                             });
                         }
-
+                        
                         doc.save(`Revision_y_Temperatura_${formattedReviewDate.replace(/\//g, '-')}.pdf`);
 
                         hideToast(loadingToast);
@@ -1079,7 +1079,7 @@
             function openNav() {
                 document.getElementById("mySidebar").style.width = "250px";
             }
-
+            
             function closeNav() {
                 document.getElementById("mySidebar").style.width = "0";
             }
@@ -1088,7 +1088,7 @@
                 // Esconde la pantalla de inicio
                 setTimeout(() => { document.getElementById("splash").style.opacity = "0"; }, 1500);
                 setTimeout(() => { document.getElementById("splash").style.display = "none"; }, 2000);
-
+                
                 // Carga la fecha y los nombres guardados
                 if (!reviewDateInput.value) {
                     reviewDateInput.value = getTodayDateFormattedForInput();
@@ -1101,7 +1101,7 @@
                 if (nocturnoNombreGuardado) {
                     nocturnoNombreInput.value = nocturnoNombreGuardado;
                 }
-
+                
                 render();
 
                 vespertinoNombreInput.addEventListener('input', saveAndNotify);
