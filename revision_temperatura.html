@@ -20,7 +20,7 @@
             --border-color: #e0e6ea; /* Subtle Border */
             --success-color: #2ecc71;
             --warning-color: #f39c12;
-            --danger-color: #e74c3c;
+            --danger-color: #e74c4c;
             --font-main: 'Poppins', sans-serif;
         }
 
@@ -51,7 +51,7 @@
                 padding: 15px;
             }
         }
-        
+
         /* Mobile Specific Adjustments */
         @media (max-width: 600px) {
             .title-group h1 { font-size: 18px; }
@@ -64,11 +64,9 @@
             .header-row label { font-size: 12px; }
             .header-row input { font-size: 14px; padding: 10px 12px; }
             .hamburger-menu { top: 20px; left: 20px; font-size: 24px; display: block; }
-            
-            /* Splash Screen Title Adjustment for mobile */
             #splash h2 { font-size: 18px; }
         }
-        
+
         /* Splash Screen */
         #splash {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -190,7 +188,7 @@
         .action-btn.danger:hover { background: #c0392b; }
         .action-btn.success { background: var(--success-color); }
         .action-btn.success:hover { background: #27ae60; }
-        
+
         .chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .chip {
             padding: 10px 20px;
@@ -236,7 +234,7 @@
         td {
             cursor: default;
         }
-        
+
         /* New style for input within editable cells */
         td.editable-input {
             padding: 0;
@@ -257,49 +255,14 @@
             background-color: var(--bg-light);
             box-shadow: inset 0 0 0 2px var(--accent-color);
         }
-        /* New style for valid/invalid input */
-        td.editable-input.valid input { border-color: var(--success-color); }
-        td.editable-input.invalid input { border-color: var(--danger-color); }
 
         .main-table tbody tr:hover { background-color: #f5f8fb; }
         .main-table tbody tr:last-child td { border-bottom: none; }
         td.left { text-align: left; }
-        
-        /* Notes section */
-        .notes-container {
-            margin-top: 20px;
-            padding: 20px;
-            background: var(--bg-light);
-            border-radius: 8px;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-        .notes-container h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--primary-color);
-        }
-        .notes-container textarea {
-            width: 100%;
-            min-height: 100px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 10px;
-            font-family: var(--font-main);
-            font-size: 14px;
-            resize: vertical;
-            background: var(--bg-card);
-            transition: border-color 0.3s ease;
-        }
-        .notes-container textarea:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
 
         /* Modal */
         .modal { 
-            display: none; /* Corregido: se oculta por defecto */
+            display: none; 
             position: fixed; 
             z-index: 2000; 
             left: 0; 
@@ -342,7 +305,7 @@
         .close-btn:hover, .close-btn:focus { color: var(--primary-color); }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes scaleIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
+
         /* Footer */
         .footer {
             text-align: center;
@@ -365,19 +328,70 @@
             margin: 0 5px;
         }
 
-        /* PDF/Print Styles */
-        @media print {
-            body { background: none; }
-            .main-container, header, .controls-container, .actions, .chips, .toast-container, .modal, .modal-content, .hamburger-menu { display: none; }
-            .pdf-container { display: block !important; }
-            table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid #333; padding: 10px; }
+        /* Toast Notification Styles - MODIFICADO PARA PARTE SUPERIOR */
+        #toast-container {
+            position: fixed;
+            top: 30px; /* POSICIÓN SUPERIOR */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column; /* Apilar hacia abajo */
+            align-items: center;
+        }
+        .toast {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px; /* Margen inferior para apilamiento */
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            transform: translateY(-20px); /* Viene desde arriba */
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            min-width: 250px; /* Asegura un ancho mínimo */
+            justify-content: center;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ESTILO PARA EL BOTÓN FLOTANTE DEF */
+        #btnDefrost {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background-color: var(--warning-color); /* Color visible para advertencia/acción especial */
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 16px;
+            padding: 15px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        #btnDefrost:hover {
+            background-color: #e67e22; /* Tono más oscuro */
+            transform: scale(1.05);
+        }
+        #btnDefrost:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
 <body>
     <div id="splash">
-        <img src="icon-191.png" alt="Logo">
+        <img src="icon-192.png" alt="Logo">
         <h2>REVISIÓN Y</h2>
         <h2>TEMPERATURA</h2>
         <p>Powered by Rafael Ramos</p>
@@ -396,7 +410,7 @@
             <div class="title-group">
                 <h1>GRUPO RIBA SMITH</h1>
                 <h2>R/S CHITRÉ SELECTO</h2>
-                <h1 id="main-title">REVISIÓN DE INSTALACIONES</h1>
+                <h1 id="main-title">REVISIÓN DE INSTALACIONES</h1> 
             </div>
         </header>
 
@@ -446,17 +460,19 @@
                     <tr>
                         <th style="width: 25%;">PUERTAS Y/O ÁREAS</th>
                         <th style="width: 10%;">REVISIÓN Nº1</th>
-                        <th style="width: 20%;">OBSERVACIÓN</th>
+                        <th style="width: 15%;">OBSERVACIÓN</th>
                         <th style="width: 10%;">REVISIÓN Nº2</th>
-                        <th style="width: 20%;">OBSERVACIÓN</th>
-                        <th style="width: 15%;">REVISIÓN Nº3</th>
-                        <th style="width: 20%;">OBSERVACIÓN</th>
+                        <th style="width: 15%;">OBSERVACIÓN</th>
+                        <th style="width: 10%;">REVISIÓN Nº3</th>
+                        <th style="width: 15%;">OBSERVACIÓN</th>
                     </tr>
                 </thead>
                 <tbody id="revisiones-tbody"></tbody>
             </table>
         </div>
     </div>
+
+    <div id="toast-container"></div>
 
     <div id="clearModal" class="modal">
         <div class="modal-content">
@@ -510,7 +526,7 @@
                 <strong>Protección de Datos:</strong> Se toman medidas de seguridad para proteger los datos contra el acceso no autorizado. Los datos se almacenan de forma local en el dispositivo del usuario para garantizar la confidencialidad.
             </p>
             <p>
-                <strong>Cambios en la Política:</strong> Nos reservamos el derecho de modificar esta Política de Privacidad. Se notificará a los usuarios sobre cualquier cambio a través de la propia aplicación.
+                <strong>Cambios en la Política:</strong> Nos reservamos el derecho de modificar esta Política de Privacidad. Se notificará a los usuarios sobre cualquier cambio a esta Política a través de la propia aplicación.
             </p>
         </div>
     </div>
@@ -524,7 +540,16 @@
         </p>
     </footer>
 
+    <button id="btnDefrost" class="action-btn" style="display: none;">DEF</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
     <script>
+        // *** COMENTARIO SOBRE ERROR DEL SERVICE WORKER (PWA) ***
+        // Este bloque maneja el registro del Service Worker.
+        // El error 'The URL protocol of the current origin ('null') is not supported.'
+        // ocurre si se abre el archivo con 'file://'. La solución es ejecutarlo en un servidor (localhost/https).
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('service-worker.js')
@@ -533,23 +558,26 @@
                     })
                     .catch(error => {
                         console.log('Fallo en el registro de Service Worker:', error);
+                        // El catch asegura que el error no detenga la ejecución del resto del script.
                     });
             });
         }
-        
+
         (function () {
             const DEFAULT_SECCIONES = ['TEMPERATURAS', 'REVISIONES'];
             const STORAGE_KEY_TEMPERATURAS = 'data_temperaturas';
             const STORAGE_KEY_REVISIONES = 'data_revisiones';
-            const STORAGE_KEY_VESPERTINO = 'vespertino_nombre'; // Nueva clave para el nombre vespertino
-            const STORAGE_KEY_NOCTURNO = 'nocturno_nombre'; // Nueva clave para el nombre nocturno
-            
+            const STORAGE_KEY_VESPERTINO = 'vespertino_nombre'; 
+            const STORAGE_KEY_NOCTURNO = 'nocturno_nombre'; 
+
             let dataTemperaturas = JSON.parse(localStorage.getItem(STORAGE_KEY_TEMPERATURAS));
             let dataRevisiones = JSON.parse(localStorage.getItem(STORAGE_KEY_REVISIONES));
+            let activeInput = null; // Variable para rastrear el campo de entrada activo
 
             const reviewDateInput = document.getElementById('review-date');
-            const vespertinoNombreInput = document.getElementById('vespertino-nombre'); // Se obtiene el campo
-            const nocturnoNombreInput = document.getElementById('nocturno-nombre'); // Se obtiene el campo
+            const vespertinoNombreInput = document.getElementById('vespertino-nombre'); 
+            const nocturnoNombreInput = document.getElementById('nocturno-nombre'); 
+            const btnDefrost = document.getElementById('btnDefrost'); // Referencia al botón DEF
 
             const initialTemperaturesData = [
                 { temp: '-20°', nevera: 'NEVERA DE HIELOS' }, { temp: '-23°', nevera: 'HELADERIA 1' },
@@ -612,11 +640,62 @@
                 saveTimer = setTimeout(() => {
                     localStorage.setItem(STORAGE_KEY_TEMPERATURAS, JSON.stringify(dataTemperaturas));
                     localStorage.setItem(STORAGE_KEY_REVISIONES, JSON.stringify(dataRevisiones));
-                    // Nuevo: Guarda los nombres de las revisiones
+                    // Guarda los nombres de las revisiones
                     localStorage.setItem(STORAGE_KEY_VESPERTINO, vespertinoNombreInput.value);
                     localStorage.setItem(STORAGE_KEY_NOCTURNO, nocturnoNombreInput.value);
                 }, 300);
             }
+
+            // =========================================================================
+            // LÓGICA DE TOASTS
+            // =========================================================================
+            let currentToastElement = null;
+
+            function showToast(message, iconClass, duration = 3000) {
+                const toastContainer = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.innerHTML = `<i class="${iconClass}"></i> ${message}`;
+
+                toastContainer.prepend(toast); 
+
+                setTimeout(() => { toast.classList.add('show'); }, 10); 
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => { toast.remove(); }, 300); 
+                }, duration);
+            }
+
+            function showLoadingToast(message) {
+                if (currentToastElement) hideToast(currentToastElement); 
+
+                const toastContainer = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'toast loading-toast';
+                toast.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${message}`;
+
+                toastContainer.prepend(toast);
+                currentToastElement = toast;
+
+                setTimeout(() => { toast.classList.add('show'); }, 10); 
+                return toast;
+            }
+
+            function hideToast(toastElement) {
+                if (toastElement) {
+                    toastElement.classList.remove('show');
+                    setTimeout(() => { 
+                        toastElement.remove(); 
+                        if (toastElement === currentToastElement) {
+                            currentToastElement = null;
+                        }
+                    }, 300);
+                }
+            }
+            // =========================================================================
+            // FIN LÓGICA DE TOASTS
+            // =========================================================================
 
             function validateTemperature(value) {
                 const num = parseFloat(value);
@@ -636,12 +715,14 @@
                     tableContainer = temperaturasTableContainer;
                     title = 'REVISIÓN DE TEMPERATURAS';
                     revisionesTableContainer.style.display = 'none';
+                    btnDefrost.style.display = 'block'; // Mostrar el botón DEF
                 } else {
                     dataToRender = dataRevisiones;
                     tbody = document.getElementById('revisiones-tbody');
                     tableContainer = revisionesTableContainer;
                     title = 'REVISIÓN DE INSTALACIONES';
                     temperaturasTableContainer.style.display = 'none';
+                    btnDefrost.style.display = 'none'; // Ocultar el botón DEF
                 }
 
                 mainTitle.textContent = title;
@@ -659,22 +740,33 @@
                         tr.innerHTML = `
                             <td data-field="temp">${item.temp || ''}</td>
                             <td class="left product-sensitive">${item.nevera || ''}</td>
-                            <td class="editable-input"><input type="text" inputmode="numeric" data-field="t2200" value="${item.t2200 || ''}"></td>
-                            <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0000" value="${item.t0000 || ''}"></td>
-                            <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0200" value="${item.t0200 || ''}"></td>
-                            <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0400" value="${item.t0400 || ''}"></td>
+                            <td class="editable-input"><input type="text" inputmode="numeric" data-field="t2200" data-row="${index}" value="${item.t2200 || ''}"></td>
+                            <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0000" data-row="${index}" value="${item.t0000 || ''}"></td>
+                            <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0200" data-row="${index}" value="${item.t0200 || ''}"></td>
+                            <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0400" data-row="${index}" value="${item.t0400 || ''}"></td>
                         `;
                         tr.querySelectorAll('td.editable-input input').forEach(input => {
                             const parentCell = input.closest('td');
-                            
+
+                            // Rastrea el campo activo
+                            input.addEventListener('focus', () => {
+                                activeInput = input;
+                            });
+                            input.addEventListener('blur', () => {
+                                // Desenfocar solo si no se va a usar inmediatamente el botón DEF
+                                if (activeInput === input && !btnDefrost.matches(':hover')) {
+                                     activeInput = null;
+                                }
+                            });
+
                             function handleInput() {
                                 const value = input.value.trim();
-                                const isValid = value === '' || validateTemperature(value);
-                                if (isValid) {
-                                    parentCell.classList.remove('invalid');
-                                } else {
-                                    parentCell.classList.add('invalid');
-                                }
+
+                                // Lógica para aceptar "DEF"
+                                const isDefrost = value.toUpperCase() === 'DEF';
+
+                                const isValid = value === '' || isDefrost || validateTemperature(value);
+
                                 const field = input.dataset.field;
                                 dataToRender[index][field] = value;
                                 saveAndNotify();
@@ -704,7 +796,7 @@
                     tbody.appendChild(tr);
                 });
             }
-            
+
             function renderChips() {
                 chipsEl.innerHTML = '';
                 DEFAULT_SECCIONES.forEach(s => {
@@ -719,6 +811,21 @@
                 });
             }
 
+            // LÓGICA DEL BOTÓN DEFROST (DEF)
+            btnDefrost.addEventListener('click', () => {
+                if (activeInput) {
+                    activeInput.value = 'DEF';
+                    // Dispara manualmente el evento input para guardar y validar 
+                    activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    // Para que el foco se pierda después de usar el botón flotante:
+                    activeInput.blur(); 
+                    activeInput = null;
+                } else {
+                    showToast('Toque una celda de temperatura primero.', 'fas fa-info-circle', 2000);
+                }
+            });
+
+
             btnClear.onclick = () => {
                 clearModal.style.display = 'flex';
             };
@@ -728,7 +835,7 @@
                 } else {
                     dataRevisiones = dataRevisiones.map(item => ({ ...item, rev1: '', obs1: '', rev2: '', obs2: '', rev3: '', obs3: '' }));
                 }
-                // Nuevo: Borra los nombres de los campos
+                // Borra los nombres de los campos
                 vespertinoNombreInput.value = '';
                 nocturnoNombreInput.value = '';
                 localStorage.removeItem(STORAGE_KEY_VESPERTINO);
@@ -746,7 +853,7 @@
                 e.preventDefault();
                 termsModal.style.display = 'flex';
             };
-            
+
             openPrivacyModalBtn.onclick = (e) => {
                 e.preventDefault();
                 privacyModal.style.display = 'flex';
@@ -758,143 +865,208 @@
                 if (event.target === privacyModal) privacyModal.style.display = 'none';
             };
 
+            // ******************************************************************
+            // ************ FUNCIÓN DE EXPORTACIÓN CON jsPDF.autoTable() *********
+            // ******************************************************************
             btnExport.onclick = () => {
                 if (!dataTemperaturas.length && !dataRevisiones.length) {
+                    showToast('No hay datos para exportar.', 'fas fa-exclamation-triangle', 3000);
                     return;
                 }
-                const today = new Date();
-                const day = String(today.getDate()).padStart(2, '0');
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const year = today.getFullYear();
-                const formattedToday = `${day}/${month}/${year}`;
 
-                const reviewDateValue = reviewDateInput.value;
-                let formattedReviewDate = formattedToday;
-                if (reviewDateValue) {
-                    const [y, m, d] = reviewDateValue.split('-');
-                    formattedReviewDate = `${d}/${m}/${y}`;
+                if (typeof window.jspdf === 'undefined' || typeof window.jspdf.AcroForm === 'undefined') {
+                    showToast('Error: Librería de jsPDF o AutoTable no cargada.', 'fas fa-times-circle', 4000);
+                    return;
                 }
 
-                const vespertinoNombre = document.getElementById('vespertino-nombre').value.trim();
-                const nocturnoNombre = document.getElementById('nocturno-nombre').value.trim();
+                const loadingToast = showLoadingToast('Generando PDF... por favor espere.');
 
-                let html = `
-                <html>
-                <head>
-                    <title>Reporte Riba Smith</title>
-                    <style>
-                        body { font-family: 'Poppins', sans-serif; margin: 30px; color: #111; }
-                        h1, h2, h3 { margin: 5px 0; text-align: center; }
-                        .pdf-header { text-align: center; margin-bottom: 20px; }
-                        .pdf-header h1 { font-size: 20pt; font-weight: 700; text-transform: uppercase; }
-                        .pdf-header p { font-size: 16pt; font-weight: bold; margin-top: 5px; }
-                        .pdf-header-details {
-                            display: flex;
-                            flex-wrap: wrap;
-                            justify-content: space-between;
-                            width: 90%;
-                            margin: 0 auto 20px auto;
-                            font-size: 12pt;
-                            font-weight: bold;
+                setTimeout(() => { 
+                    try {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF('p', 'mm', 'a4'); 
+                        const marginX = 15;
+                        const pageHeight = doc.internal.pageSize.height;
+
+                        const vespertinoNombre = vespertinoNombreInput.value.trim();
+                        const nocturnoNombre = nocturnoNombreInput.value.trim();
+
+                        const reviewDateValue = reviewDateInput.value;
+                        let formattedReviewDate = 'N/A';
+                        if (reviewDateValue) {
+                            const [y, m, d] = reviewDateValue.split('-');
+                            formattedReviewDate = `${d}/${m}/${y}`;
+                        } else {
+                            const today = new Date();
+                            formattedReviewDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
                         }
-                        .pdf-header-details div {
-                            margin-bottom: 10px;
+
+                        const PDF_MAIN_TITLE = "REVISIÓN DE INSTALACIONES Y TEMPERATURAS DE NEVERAS";
+
+                        const addHeaderAndFooter = (doc) => { 
+                            let yPos = 15;
+
+                            if (doc.internal.getNumberOfPages() === 1) {
+                                doc.setFontSize(16).setFont('helvetica', 'bold');
+                                doc.text("GRUPO RIBA SMITH", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                                yPos += 6;
+                                doc.setFontSize(12).setFont('helvetica', 'normal');
+                                doc.text("R/S CHITRÉ SELECTO", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                                yPos += 5;
+
+                                doc.setFontSize(12).setFont('helvetica', 'bold');
+                                const titleLines = doc.splitTextToSize(PDF_MAIN_TITLE, doc.internal.pageSize.width - marginX * 2);
+                                doc.text(titleLines, doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                                yPos += (titleLines.length * 5) + 3;
+
+                                doc.setFontSize(10).setFont('helvetica', 'bold'); 
+                                const detailHeight = 5;
+
+                                doc.text(`Fecha de Revisión:`, marginX, yPos);
+                                doc.text(`Revisión Vespertina:`, doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                                doc.text(`Revisión Nocturna:`, doc.internal.pageSize.width - marginX, yPos, { align: 'right' });
+
+                                yPos += detailHeight - 1; 
+
+                                doc.setFontSize(10).setFont('helvetica', 'normal'); 
+                                doc.text(formattedReviewDate, marginX, yPos);
+                                doc.text(vespertinoNombre || "________________", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                                doc.text(nocturnoNombre || "________________", doc.internal.pageSize.width - marginX, yPos, { align: 'right' });
+
+                                yPos += detailHeight + 5;
+                            }
+
+                            doc.setFontSize(8).setFont('helvetica', 'normal');
+                            doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
+
+                            const footerText = 'Powered by Rafael Ramos';
+                            doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
+
+                            return (doc.internal.getNumberOfPages() === 1) ? yPos : 15;
+                        };
+
+                        // --- 2. GENERAR TABLA DE TEMPERATURAS (AJUSTADA) ---
+                        if (dataTemperaturas.length) {
+                            let currentY = addHeaderAndFooter(doc);
+
+                            const tempHeaders = [
+                                { header: 'TEMP', dataKey: 'temp' },
+                                { header: 'NEVERAS', dataKey: 'nevera' },
+                                { header: '22:00', dataKey: 't2200' },
+                                { header: '00:00', dataKey: 't0000' },
+                                { header: '02:00', dataKey: 't0200' },
+                                { header: '04:00', dataKey: 't0400' },
+                            ];
+
+                            const tempBody = dataTemperaturas.map(d => [
+                                d.temp || '', d.nevera || '', d.t2200 || '', d.t0000 || '', d.t0200 || '', d.t0400 || ''
+                            ]);
+
+                            doc.autoTable({
+                                startY: currentY,
+                                head: [tempHeaders.map(h => h.header)],
+                                body: tempBody,
+                                theme: 'grid',
+                                styles: { fontSize: 8, cellPadding: 2, halign: 'center' },
+                                headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], fontStyle: 'bold' },
+                                columnStyles: {
+                                    0: { cellWidth: 15 }, 
+                                    1: { cellWidth: 60, halign: 'left' }, 
+                                    2: { cellWidth: 25 }, 
+                                    3: { cellWidth: 25 }, 
+                                    4: { cellWidth: 25 }, 
+                                    5: { cellWidth: 25 }, 
+                                },
+                                tableWidth: 'wrap', 
+                                margin: { left: marginX, right: marginX, top: 15, bottom: 15 }, 
+
+                                didDrawPage: (data) => {
+                                    doc.setFontSize(8).setFont('helvetica', 'normal');
+                                    const footerText = 'Powered by Rafael Ramos';
+                                    doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
+
+                                    if (data.pageNumber > 1) { 
+                                        doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
+                                        data.cursor.y = 15;
+                                    }
+                                }
+                            });
                         }
-                        .pdf-section-title { margin-top: 25px; font-size: 16pt; font-weight: 700; text-align: center; text-transform: uppercase; }
-                        table { width: 90%; border-collapse: collapse; margin: 15px auto; font-size: 12pt; table-layout: fixed; }
-                        th, td { border: 1px solid #333; padding: 8px; text-align: center; }
-                        th { background: #f0f0f0; font-weight: bold; }
-                        .notes-section { width: 90%; margin: 20px auto; font-size: 12pt; }
-                        .notes-section h3 { font-size: 14pt; font-weight: 600; text-align: left; }
-                        .notes-section p { white-space: pre-wrap; text-align: justify; }
-                        .page-break { page-break-before: always; }
-                        .pdf-footer { text-align: center; font-size: 16pt; font-weight: bold; color: #666; margin-top: 20px; position: relative; }
-                    </style>
-                </head>
-                <body>
-                    <div class="pdf-header">
-                        <h1>GRUPO RIBA SMITH</h1>
-                        <h2>R/S CHITRÉ SELECTO</h2>
-                        <h2>REVISIÓN DE INSTALACIONES Y TEMPERATURAS</h2>
-                    </div>
-                    <div class="pdf-header-details">
-                        <div>Fecha de Revisión: ${formattedReviewDate}</div>
-                        <div>Revisión Vespertina: ${vespertinoNombre || "________________"}</div>
-                        <div>Revisión Nocturna: ${nocturnoNombre || "________________"}</div>
-                    </div>
-                `;
-                if (dataTemperaturas.length) {
-                    html += `
-                    <div class="pdf-section-title">Temperaturas</div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>TEMP</th>
-                                <th>NEVERAS</th>
-                                <th>22:00</th>
-                                <th>00:00</th>
-                                <th>02:00</th>
-                                <th>04:00</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                    `;
-                    dataTemperaturas.forEach(d => {
-                        html += `
-                            <tr>
-                                <td>${d.temp || ""}</td>
-                                <td style="text-align: left;">${d.nevera || ""}</td>
-                                <td>${d.t2200 || ""}</td>
-                                <td>${d.t0000 || ""}</td>
-                                <td>${d.t0200 || ""}</td>
-                                <td>${d.t0400 || ""}</td>
-                            </tr>`;
-                    });
-                    html += `</tbody></table>
-                    `;
-                }
-                if (dataRevisiones.length) {
-                    if (dataTemperaturas.length) {
-                        html += `<div class="page-break"></div>`;
+
+                        // --- 3. GENERAR TABLA DE REVISIONES (AJUSTADA Y CORREGIDA) ---
+                        if (dataRevisiones.length) {
+                            // Añadir página si ya se generó la de temperaturas o si no hay temperaturas.
+                            if (doc.internal.getNumberOfPages() > 1 || dataTemperaturas.length > 0) {
+                                 doc.addPage();
+                                 let currentY = addHeaderAndFooter(doc); 
+                            } else {
+                                let currentY = addHeaderAndFooter(doc);
+                            }
+
+                            const revHeaders = [
+                                { header: 'PUERTAS Y/O ÁREAS', dataKey: 'area' },
+                                { header: 'REV. N°1', dataKey: 'rev1' },
+                                { header: 'OBSERVACIÓN', dataKey: 'obs1' },
+                                { header: 'REV. N°2', dataKey: 'rev2' },
+                                { header: 'OBSERVACIÓN', dataKey: 'obs2' },
+                                { header: 'REV. N°3', dataKey: 'rev3' },
+                                { header: 'OBSERVACIÓN', dataKey: 'obs3' },
+                            ];
+
+                            const revBody = dataRevisiones.map(d => [
+                                d.area || '', d.rev1 || '', d.obs1 || '', d.rev2 || '', d.obs2 || '', d.rev3 || '', d.obs3 || ''
+                            ]);
+
+                            let revPageCount = 0; 
+
+                            doc.autoTable({
+                                startY: doc.autoTable.previous.finalY > 0 ? doc.autoTable.previous.finalY + 5 : 20,
+                                head: [revHeaders.map(h => h.header)],
+                                body: revBody,
+                                theme: 'grid',
+                                styles: { fontSize: 8, cellPadding: 2, halign: 'center' },
+                                headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], fontStyle: 'bold' },
+                                // *** AJUSTES EN EL ANCHO DE COLUMNA PARA EVITAR EL ERROR '5 units width could not fit page' ***
+                                columnStyles: {
+                                    0: { cellWidth: 40, halign: 'left' }, 
+                                    1: { cellWidth: 14 }, 
+                                    2: { cellWidth: 32 }, 
+                                    3: { cellWidth: 14 }, 
+                                    4: { cellWidth: 32 }, 
+                                    5: { cellWidth: 14 }, 
+                                    6: { cellWidth: 32 }, 
+                                },
+                                tableWidth: 'wrap', 
+                                margin: { left: marginX, right: marginX, top: 15, bottom: 15 },
+
+                                didDrawPage: (data) => {
+                                    revPageCount++; 
+                                    doc.setFontSize(8).setFont('helvetica', 'normal');
+                                    const footerText = 'Powered by Rafael Ramos';
+                                    doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
+
+                                    if (revPageCount > 1) {
+                                        doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
+                                        data.cursor.y = 15; 
+                                    }
+                                }
+                            });
+                        }
+
+                        doc.save(`Revision_y_Temperatura_${formattedReviewDate.replace(/\//g, '-')}.pdf`);
+
+                        hideToast(loadingToast);
+                        showToast('¡PDF guardado con éxito!', 'fas fa-check-circle', 4000);
+                    } catch (e) {
+                        console.error("Error al generar el PDF:", e);
+                        hideToast(loadingToast);
+                        showToast('Error al generar el PDF. Revise la consola.', 'fas fa-times-circle', 5000);
                     }
-                    html += `
-                    <div class="pdf-section-title">Revisiones</div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 25%;">PUERTAS Y/O ÁREAS</th>
-                                <th style="width: 10%;">REVISIÓN Nº1</th>
-                                <th style="width: 20%;">OBSERVACIÓN</th>
-                                <th style="width: 10%;">REVISIÓN Nº2</th>
-                                <th style="width: 20%;">OBSERVACIÓN</th>
-                                <th style="width: 15%;">REVISIÓN Nº3</th>
-                                <th style="width: 20%;">OBSERVACIÓN</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                    `;
-                    dataRevisiones.forEach(d => {
-                        html += `
-                            <tr>
-                                <td style="text-align: left;">${d.area || ""}</td>
-                                <td>${d.rev1 || ""}</td>
-                                <td>${d.obs1 || ""}</td>
-                                <td>${d.rev2 || ""}</td>
-                                <td>${d.obs2 || ""}</td>
-                                <td>${d.rev3 || ""}</td>
-                                <td>${d.obs3 || ""}</td>
-                            </tr>`;
-                    });
-                    html += `</tbody></table>
-                    `;
-                }
-                html += `<div class="pdf-footer">Powered by Rafael Ramos</div></body></html>`;
-                const win = window.open("", "_blank");
-                win.document.write(html);
-                win.document.close();
-                win.focus();
-                setTimeout(() => win.print(), 500);
+                }, 100);
             };
+            // ******************************************************************
+            // ************ FIN DE FUNCIÓN CON jsPDF.autoTable() ****************
+            // ******************************************************************
 
             function getTodayDateFormattedForInput() {
                 const today = new Date();
@@ -907,18 +1079,20 @@
             function openNav() {
                 document.getElementById("mySidebar").style.width = "250px";
             }
-            
+
             function closeNav() {
                 document.getElementById("mySidebar").style.width = "0";
             }
 
             window.addEventListener("load", () => {
+                // Esconde la pantalla de inicio
                 setTimeout(() => { document.getElementById("splash").style.opacity = "0"; }, 1500);
                 setTimeout(() => { document.getElementById("splash").style.display = "none"; }, 2000);
+
+                // Carga la fecha y los nombres guardados
                 if (!reviewDateInput.value) {
                     reviewDateInput.value = getTodayDateFormattedForInput();
                 }
-                // Nuevo: Cargar los nombres guardados del localStorage
                 const vespertinoNombreGuardado = localStorage.getItem(STORAGE_KEY_VESPERTINO);
                 if (vespertinoNombreGuardado) {
                     vespertinoNombreInput.value = vespertinoNombreGuardado;
@@ -927,9 +1101,9 @@
                 if (nocturnoNombreGuardado) {
                     nocturnoNombreInput.value = nocturnoNombreGuardado;
                 }
+
                 render();
 
-                // Nuevo: Escuchar los cambios en los campos de nombre para guardar automáticamente
                 vespertinoNombreInput.addEventListener('input', saveAndNotify);
                 nocturnoNombreInput.addEventListener('input', saveAndNotify);
             });
