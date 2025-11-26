@@ -21,6 +21,7 @@
             --success-color: #2ecc71;
             --warning-color: #f39c12;
             --danger-color: #e74c4c;
+            --info-color: #9b59b6; /* New color for LAV */
             --font-main: 'Poppins', sans-serif;
         }
 
@@ -32,7 +33,7 @@
             background: var(--bg-light);
             color: var(--primary-color);
             line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
+            -webkit-font-smoothing: antialiasing;
             -moz-osx-font-smoothing: grayscale;
             padding-bottom: 80px; /* Space for the fixed footer */
         }
@@ -51,7 +52,7 @@
                 padding: 15px;
             }
         }
-        
+
         /* Mobile Specific Adjustments */
         @media (max-width: 600px) {
             .title-group h1 { font-size: 18px; }
@@ -65,8 +66,12 @@
             .header-row input { font-size: 14px; padding: 10px 12px; }
             .hamburger-menu { top: 20px; left: 20px; font-size: 24px; display: block; }
             #splash h2 { font-size: 18px; }
+            
+            /* Ajuste de botones flotantes en móvil */
+            #btnDefrost { bottom: 85px; right: 15px; font-size: 14px; padding: 12px 16px; }
+            #btnLavado { bottom: 20px; right: 15px; font-size: 14px; padding: 12px 16px; }
         }
-        
+
         /* Splash Screen */
         #splash {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -188,7 +193,7 @@
         .action-btn.danger:hover { background: #c0392b; }
         .action-btn.success { background: var(--success-color); }
         .action-btn.success:hover { background: #27ae60; }
-        
+
         .chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .chip {
             padding: 10px 20px;
@@ -219,6 +224,28 @@
             font-size: 14px;
             background: var(--bg-card);
         }
+        /* Estilo para la nueva tabla de Contenedores (evitar centrado) */
+        .container-temp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background: var(--bg-card);
+        }
+        .container-temp-table th, .container-temp-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: center;
+            vertical-align: top;
+        }
+        .container-temp-table th {
+            background: var(--primary-color);
+            color: white;
+        }
+        .container-temp-table .fixed-hours {
+            font-weight: 600; /* Resalta las horas fijas */
+            background-color: #fcfcfc;
+        }
+
         th, td {
             border: 1px solid var(--border-color);
             padding: 15px;
@@ -234,7 +261,7 @@
         td {
             cursor: default;
         }
-        
+
         /* New style for input within editable cells */
         td.editable-input {
             padding: 0;
@@ -259,7 +286,7 @@
         .main-table tbody tr:hover { background-color: #f5f8fb; }
         .main-table tbody tr:last-child td { border-bottom: none; }
         td.left { text-align: left; }
-        
+
         /* Modal */
         .modal { 
             display: none; 
@@ -283,7 +310,7 @@
             max-width: 450px;
             text-align: center;
             position: relative;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
             animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             max-height: 80vh; 
             overflow-y: auto; 
@@ -305,7 +332,7 @@
         .close-btn:hover, .close-btn:focus { color: var(--primary-color); }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes scaleIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
+
         /* Footer */
         .footer {
             text-align: center;
@@ -362,13 +389,10 @@
             transform: translateY(0);
         }
 
-        /* ESTILO PARA EL BOTÓN FLOTANTE DEF */
-        #btnDefrost {
+        /* ESTILO PARA LOS BOTONES FLOTANTES */
+        .floating-btn {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
             z-index: 1000;
-            background-color: var(--warning-color); /* Color visible para advertencia/acción especial */
             color: var(--primary-color);
             font-weight: 700;
             font-size: 16px;
@@ -379,14 +403,43 @@
             cursor: pointer;
             text-transform: uppercase;
             transition: transform 0.2s, background-color 0.2s;
+            text-decoration: none; /* Asegura que no tenga estilo de enlace si se usa la clase */
+        }
+
+        /* Botón DEFROST (DEF) */
+        #btnDefrost {
+            bottom: 20px;
+            right: 120px; /* Mover a la izquierda para hacer espacio para LAV */
+            background-color: var(--warning-color); 
         }
         #btnDefrost:hover {
-            background-color: #e67e22; /* Tono más oscuro */
+            background-color: #e67e22; 
             transform: scale(1.05);
         }
         #btnDefrost:active {
             transform: scale(0.95);
         }
+
+        /* Botón LAVADO (LAV) - NUEVO */
+        #btnLavado {
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--info-color); /* Color distintivo */
+            color: white;
+        }
+        #btnLavado:hover {
+            background-color: #8e44ad; /* Tono más oscuro */
+            transform: scale(1.05);
+        }
+        #btnLavado:active {
+            transform: scale(0.95);
+        }
+
+        @media (max-width: 600px) {
+            #btnDefrost { right: 15px; bottom: 85px; }
+            #btnLavado { right: 15px; bottom: 20px; }
+        }
+
     </style>
 </head>
 <body>
@@ -417,7 +470,7 @@
         <div class="header-info">
             <div class="header-row">
                 <label for="review-date">Fecha de Revisión:</label>
-                <input type="date" id="review-date">
+                <input type="date" id="review-date"> 
             </div>
             <div class="header-row">
                 <label for="vespertino-nombre">Revisión Vespertina:</label>
@@ -470,7 +523,28 @@
                 <tbody id="revisiones-tbody"></tbody>
             </table>
         </div>
-    </div>
+        
+        <div class="table-container" id="contenedor-table-container" style="display: none;">
+            <table id="contenedor-tabla" class="container-temp-table">
+                <thead>
+                    <tr>
+                        <th>N° DE CONT.</th>
+                        <th>TEMP OBJETIVO</th>
+                        <th>FECHA REVISIÓN</th> 
+                        <th>HORA REVISIÓN</th>
+                        <th>TEMP. REG.</th>
+                        <th>SEGURIDAD</th>
+                    </tr>
+                </thead>
+                <tbody id="contenedor-tbody"></tbody>
+            </table>
+            <div class="observaciones" style="padding: 15px 0;">
+                <h3>Observación:</h3>
+                <p>1- Cuando el contenedor mantiene la luz **roja** donde dice **DEFROST** es porque se mantiene en descongelamiento y la temperatura debe llegar a **-16°** y luego ir bajando.</p>
+                <p>2- El personal cuando proceda a introducir o a retirar mercancía del contenedor deberá **apagarlo** y cuando terminen de introducir o retirar mercancía nuevamente **encenderlo**.</p>
+            </div>
+        </div>
+        </div>
 
     <div id="toast-container"></div>
 
@@ -539,17 +613,15 @@
             <a href="#" id="openPrivacyModal">Política de Privacidad</a>
         </p>
     </footer>
+
+    <button id="btnDefrost" class="floating-btn" style="display: none;">DEF</button>
     
-    <button id="btnDefrost" class="action-btn" style="display: none;">DEF</button>
+    <button id="btnLavado" class="floating-btn" style="display: none;">LAV</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
     <script>
-        // *** COMENTARIO SOBRE ERROR DEL SERVICE WORKER (PWA) ***
-        // Este bloque maneja el registro del Service Worker.
-        // El error 'The URL protocol of the current origin ('null') is not supported.'
-        // ocurre si se abre el archivo con 'file://'. La solución es ejecutarlo en un servidor (localhost/https).
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('service-worker.js')
@@ -558,26 +630,29 @@
                     })
                     .catch(error => {
                         console.log('Fallo en el registro de Service Worker:', error);
-                        // El catch asegura que el error no detenga la ejecución del resto del script.
                     });
             });
         }
-        
+
         (function () {
-            const DEFAULT_SECCIONES = ['TEMPERATURAS', 'REVISIONES'];
+            // Se cambia el nombre de la sección de contenedores a CONTENEDOR
+            const DEFAULT_SECCIONES = ['TEMPERATURAS', 'REVISIONES', 'CONTENEDOR'];
             const STORAGE_KEY_TEMPERATURAS = 'data_temperaturas';
             const STORAGE_KEY_REVISIONES = 'data_revisiones';
+            const STORAGE_KEY_CONTENEDOR = 'data_contenedor'; // Clave de almacenamiento cambiada
             const STORAGE_KEY_VESPERTINO = 'vespertino_nombre'; 
             const STORAGE_KEY_NOCTURNO = 'nocturno_nombre'; 
-            
+
             let dataTemperaturas = JSON.parse(localStorage.getItem(STORAGE_KEY_TEMPERATURAS));
             let dataRevisiones = JSON.parse(localStorage.getItem(STORAGE_KEY_REVISIONES));
+            let dataContenedor = JSON.parse(localStorage.getItem(STORAGE_KEY_CONTENEDOR)); // Variable de datos cambiada
             let activeInput = null; // Variable para rastrear el campo de entrada activo
 
             const reviewDateInput = document.getElementById('review-date');
             const vespertinoNombreInput = document.getElementById('vespertino-nombre'); 
             const nocturnoNombreInput = document.getElementById('nocturno-nombre'); 
-            const btnDefrost = document.getElementById('btnDefrost'); // Referencia al botón DEF
+            const btnDefrost = document.getElementById('btnDefrost'); 
+            const btnLavado = document.getElementById('btnLavado'); // NUEVO BOTÓN LAVADO
 
             const initialTemperaturesData = [
                 { temp: '-20°', nevera: 'NEVERA DE HIELOS' }, { temp: '-23°', nevera: 'HELADERIA 1' },
@@ -610,13 +685,36 @@
                 { area: 'PUERTA OFICINA LIC MELISSA' }, { area: 'PUERTA DE SERVIDORES' },
                 { area: 'PUERTA DE SEGURIDAD' }, { area: 'PUERTA DE BÓVEDA' },
             ];
+            
+            // Datos para la tabla de Contenedor (modificados: eliminada fecha_inicial)
+            const initialContenedorData = [
+                {
+                    cont_num: 'EGHU 500081-3', 
+                    cont_temp_target: '(-24°)',
+                    rows: [
+                        { hora: '06:00', fecha_rev: '', temp_reg: '', seguridad: '' }, 
+                        { hora: '10:00', fecha_rev: '', temp_reg: '', seguridad: '' }, 
+                        { hora: '14:00', fecha_rev: '', temp_reg: '', seguridad: '' }, 
+                        { hora: '18:00', fecha_rev: '', temp_reg: '', seguridad: '' }, 
+                        { hora: '22:00', fecha_rev: '', temp_reg: '', seguridad: '' }, 
+                        { hora: '02:00', fecha_rev: '', temp_reg: '', seguridad: '' }, 
+                    ]
+                }
+            ];
 
+            // Inicialización de datos
             if (!dataTemperaturas || dataTemperaturas.length === 0 || !dataTemperaturas[0].nevera) {
                 dataTemperaturas = initialTemperaturesData.map(item => ({ ...item, t2200: '', t0000: '', t0200: '', t0400: '' }));
             }
             if (!dataRevisiones || dataRevisiones.length === 0 || !dataRevisiones[0].area) {
                 dataRevisiones = initialRevisionesData.map(item => ({ ...item, rev1: '', obs1: '', rev2: '', obs2: '', rev3: '', obs3: '' }));
             }
+            // Inicializa la data del contenedor si no existe
+            if (!dataContenedor || dataContenedor.length === 0 || !dataContenedor[0].cont_num) {
+                 // Usa una copia profunda para asegurar que los cambios se reflejen solo en el almacenamiento
+                dataContenedor = JSON.parse(JSON.stringify(initialContenedorData));
+            }
+
 
             let seccionActiva = DEFAULT_SECCIONES[0];
             const chipsEl = document.getElementById('chips');
@@ -625,6 +723,7 @@
             const mainTitle = document.getElementById('main-title');
             const temperaturasTableContainer = document.getElementById('temperaturas-table-container');
             const revisionesTableContainer = document.getElementById('revisiones-table-container');
+            const contenedorTableContainer = document.getElementById('contenedor-table-container'); // Contenedor cambiado
             const clearModal = document.getElementById('clearModal');
             const termsModal = document.getElementById('termsModal');
             const privacyModal = document.getElementById('privacyModal');
@@ -640,15 +739,12 @@
                 saveTimer = setTimeout(() => {
                     localStorage.setItem(STORAGE_KEY_TEMPERATURAS, JSON.stringify(dataTemperaturas));
                     localStorage.setItem(STORAGE_KEY_REVISIONES, JSON.stringify(dataRevisiones));
-                    // Guarda los nombres de las revisiones
+                    localStorage.setItem(STORAGE_KEY_CONTENEDOR, JSON.stringify(dataContenedor)); // Guarda data del contenedor
                     localStorage.setItem(STORAGE_KEY_VESPERTINO, vespertinoNombreInput.value);
                     localStorage.setItem(STORAGE_KEY_NOCTURNO, nocturnoNombreInput.value);
                 }, 300);
             }
 
-            // =========================================================================
-            // LÓGICA DE TOASTS
-            // =========================================================================
             let currentToastElement = null;
 
             function showToast(message, iconClass, duration = 3000) {
@@ -656,11 +752,8 @@
                 const toast = document.createElement('div');
                 toast.className = 'toast';
                 toast.innerHTML = `<i class="${iconClass}"></i> ${message}`;
-                
                 toastContainer.prepend(toast); 
-
                 setTimeout(() => { toast.classList.add('show'); }, 10); 
-
                 setTimeout(() => {
                     toast.classList.remove('show');
                     setTimeout(() => { toast.remove(); }, 300); 
@@ -669,15 +762,12 @@
 
             function showLoadingToast(message) {
                 if (currentToastElement) hideToast(currentToastElement); 
-                
                 const toastContainer = document.getElementById('toast-container');
                 const toast = document.createElement('div');
                 toast.className = 'toast loading-toast';
                 toast.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${message}`;
-                
                 toastContainer.prepend(toast);
                 currentToastElement = toast;
-
                 setTimeout(() => { toast.classList.add('show'); }, 10); 
                 return toast;
             }
@@ -693,110 +783,237 @@
                     }, 300);
                 }
             }
-            // =========================================================================
-            // FIN LÓGICA DE TOASTS
-            // =========================================================================
 
             function validateTemperature(value) {
                 const num = parseFloat(value);
                 return !isNaN(num) && num >= -30 && num <= 10;
             }
+            
+            /**
+             * Convierte un objeto Date a un string DD/MM/YYYY.
+             * @param {Date} dateObj
+             * @returns {string} Fecha en formato DD/MM/YYYY
+             */
+            function formatDateToDmy(dateObj) {
+                if (!(dateObj instanceof Date) || isNaN(dateObj)) return '';
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const year = dateObj.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
 
-            function render() {
-                renderChips();
-                let dataToRender;
-                let tbody;
-                let tableContainer;
-                let title;
-
-                if (seccionActiva === 'TEMPERATURAS') {
-                    dataToRender = dataTemperaturas;
-                    tbody = document.getElementById('temperaturas-tbody');
-                    tableContainer = temperaturasTableContainer;
-                    title = 'REVISIÓN DE TEMPERATURAS';
-                    revisionesTableContainer.style.display = 'none';
-                    btnDefrost.style.display = 'block'; // Mostrar el botón DEF
-                } else {
-                    dataToRender = dataRevisiones;
-                    tbody = document.getElementById('revisiones-tbody');
-                    tableContainer = revisionesTableContainer;
-                    title = 'REVISIÓN DE INSTALACIONES';
-                    temperaturasTableContainer.style.display = 'none';
-                    btnDefrost.style.display = 'none'; // Ocultar el botón DEF
+            /**
+             * Convierte un string yyyy-mm-dd (del input type="date") a DD/MM/YYYY.
+             * @param {string} yyyymmdd
+             * @returns {string} Fecha en formato DD/MM/YYYY
+             */
+            function formatYyyyMmDdToDmy(yyyymmdd) {
+                if (!yyyymmdd || typeof yyyymmdd !== 'string' || !yyyymmdd.match(/^\d{4}-\d{2}-\d{2}$/)) return '';
+                const parts = yyyymmdd.split('-');
+                if (parts.length === 3) {
+                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
                 }
+                return yyyymmdd;
+            }
 
-                mainTitle.textContent = title;
-                tableContainer.style.display = 'block';
+            // Función para obtener la fecha de hoy en formato yyyy-mm-dd para inputs
+            function getTodayDateFormattedForInput() {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            // Función para guardar datos del contenedor 
+            function saveContenedorData(inputElement) {
+                const field = inputElement.dataset.field;
+                const contRowIndex = inputElement.dataset.contRow;
+                const value = inputElement.value.trim();
+                const contData = dataContenedor[0];
+                
+                if (contRowIndex !== undefined) {
+                    const row = contData.rows[contRowIndex];
+                    if (field === 'temp_reg') {
+                        row.temp_reg = value.toUpperCase();
+                    } else if (field === 'seguridad') {
+                        row.seguridad = value;
+                    } else if (field === 'fecha_rev') {
+                        // Guardar la fecha en formato nativo del input (YYYY-MM-DD)
+                        row.fecha_rev = value; 
+                    }
+                }
+                saveAndNotify();
+            }
+
+            // Nueva función para renderizar la tabla de Contenedor (Actualizada: Orden y formato de fecha)
+            function renderContenedor() {
+                const tbody = document.getElementById('contenedor-tbody');
                 tbody.innerHTML = '';
-
-                if (!dataToRender.length) {
-                    tbody.innerHTML = `<tr><td colspan="7" style="color:var(--secondary-color);text-align:center;padding:20px;">Sin datos en esta sección.</td></tr>`;
+                
+                if (!dataContenedor.length) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="color:var(--secondary-color);text-align:center;padding:20px;">Sin datos de contenedor.</td></tr>`;
                     return;
                 }
 
-                dataToRender.forEach((item, index) => {
-                    const tr = document.createElement('tr');
-                    if (seccionActiva === 'TEMPERATURAS') {
-                        tr.innerHTML = `
-                            <td data-field="temp">${item.temp || ''}</td>
-                            <td class="left product-sensitive">${item.nevera || ''}</td>
-                            <td class="editable-input"><input type="text" inputmode="numeric" data-field="t2200" data-row="${index}" value="${item.t2200 || ''}"></td>
-                            <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0000" data-row="${index}" value="${item.t0000 || ''}"></td>
-                            <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0200" data-row="${index}" value="${item.t0200 || ''}"></td>
-                            <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0400" data-row="${index}" value="${item.t0400 || ''}"></td>
-                        `;
-                        tr.querySelectorAll('td.editable-input input').forEach(input => {
-                            const parentCell = input.closest('td');
-                            
-                            // Rastrea el campo activo
-                            input.addEventListener('focus', () => {
-                                activeInput = input;
-                            });
-                            input.addEventListener('blur', () => {
-                                // Desenfocar solo si no se va a usar inmediatamente el botón DEF
-                                if (activeInput === input && !btnDefrost.matches(':hover')) {
-                                     activeInput = null;
-                                }
-                            });
-                            
-                            function handleInput() {
-                                const value = input.value.trim();
-                                
-                                // Lógica para aceptar "DEF"
-                                const isDefrost = value.toUpperCase() === 'DEF';
-                                
-                                const isValid = value === '' || isDefrost || validateTemperature(value);
-                                
-                                const field = input.dataset.field;
-                                dataToRender[index][field] = value;
-                                saveAndNotify();
-                            }
+                const contData = dataContenedor[0]; 
+                const contRows = contData.rows;
+                const totalRows = contRows.length;
+                const todayDateInputFormat = getTodayDateFormattedForInput();
 
-                            input.addEventListener('input', handleInput);
-                            handleInput();
-                        });
-                    } else {
-                        tr.innerHTML = `
-                            <td data-field="area">${item.area || ''}</td>
-                            <td class="editable" contenteditable="true" data-field="rev1">${item.rev1 || ''}</td>
-                            <td class="editable" contenteditable="true" data-field="obs1">${item.obs1 || ''}</td>
-                            <td class="editable" contenteditable="true" data-field="rev2">${item.rev2 || ''}</td>
-                            <td class="editable" contenteditable="true" data-field="obs2">${item.obs2 || ''}</td>
-                            <td class="editable" contenteditable="true" data-field="rev3">${item.rev3 || ''}</td>
-                            <td class="editable" contenteditable="true" data-field="obs3">${item.obs3 || ''}</td>
-                        `;
-                        tr.querySelectorAll('td.editable').forEach(td => {
-                            td.addEventListener('blur', () => {
-                                const field = td.dataset.field;
-                                dataToRender[index][field] = td.innerText.trim();
-                                saveAndNotify();
-                            });
-                        });
+                contRows.forEach((item, rowIndex) => {
+                    const tr = document.createElement('tr');
+                    
+                    // Solo la primera fila lleva el N° de Cont. y TEMP OBJETIVO con rowspan
+                    if (rowIndex === 0) {
+                        tr.innerHTML += `<td rowspan="${totalRows}">${contData.cont_num}</td>`;
+                        tr.innerHTML += `<td rowspan="${totalRows}">${contData.cont_temp_target}</td>`;
                     }
+                    
+                    // Columna FECHA REVISIÓN (Editable, USA INPUT DATE)
+                    // Guardamos YYYY-MM-DD pero mostramos con el input type="date"
+                    tr.innerHTML += `
+                        <td class="editable-input">
+                            <input type="date" data-field="fecha_rev" data-cont-row="${rowIndex}" value="${item.fecha_rev || todayDateInputFormat}">
+                        </td>
+                    `;
+                    
+                    // Columna HORA REVISIÓN (Fija)
+                    tr.innerHTML += `<td class="fixed-hours">${item.hora}</td>`;
+
+                    // Columna TEMP. REG. (Editable)
+                    tr.innerHTML += `
+                        <td class="editable-input">
+                            <input type="text" inputmode="numeric" data-field="temp_reg" data-cont-row="${rowIndex}" value="${item.temp_reg || ''}">
+                        </td>
+                    `;
+                    
+                    // Columna SEGURIDAD (Editable)
+                    tr.innerHTML += `
+                        <td class="editable-input">
+                            <input type="text" data-field="seguridad" data-cont-row="${rowIndex}" value="${item.seguridad || ''}">
+                        </td>
+                    `;
+                    
                     tbody.appendChild(tr);
+
+                    // Event Listeners para la nueva tabla
+                    tr.querySelectorAll('td.editable-input input').forEach(input => {
+                        const field = input.dataset.field;
+                        
+                        input.addEventListener('focus', () => { activeInput = input; });
+                        input.addEventListener('blur', () => {
+                            if (activeInput === input && !btnDefrost.matches(':hover') && !btnLavado.matches(':hover')) { activeInput = null; }
+                            // Guardar datos al perder el foco
+                            saveContenedorData(input);
+                        });
+                        
+                        input.addEventListener('input', () => {
+                            // Lógica para aceptar "DEF" y validación para Temp. Reg.
+                            if (field === 'temp_reg') {
+                                const value = input.value.trim().toUpperCase();
+                                // (Lógica de validación)
+                            }
+                        });
+                    });
                 });
             }
+
+            function render() {
+                renderChips();
+                // Ocultar todos los contenedores de tabla
+                temperaturasTableContainer.style.display = 'none';
+                revisionesTableContainer.style.display = 'none';
+                contenedorTableContainer.style.display = 'none'; // Ocultar el nuevo contenedor
+                
+                // OCULTAR AMBOS BOTONES FLOTANTES POR DEFECTO
+                btnDefrost.style.display = 'none';
+                btnLavado.style.display = 'none';
+
+
+                if (seccionActiva === 'TEMPERATURAS') {
+                    mainTitle.textContent = 'REVISIÓN DE TEMPERATURAS';
+                    temperaturasTableContainer.style.display = 'block';
+                    // Mostrar DEF y LAV en TEMPERATURAS
+                    btnDefrost.style.display = 'block';
+                    btnLavado.style.display = 'block';
+                    renderTemperaturas();
+                } else if (seccionActiva === 'REVISIONES') {
+                    mainTitle.textContent = 'REVISIÓN DE INSTALACIONES';
+                    revisionesTableContainer.style.display = 'block';
+                    renderRevisiones();
+                } else if (seccionActiva === 'CONTENEDOR') { // Sección cambiada a singular
+                    mainTitle.textContent = 'CONTROL DE TEMPERATURA DE CONTENEDOR';
+                    contenedorTableContainer.style.display = 'block';
+                    // Mostrar solo DEF en CONTENEDOR
+                    btnDefrost.style.display = 'block'; 
+                    btnLavado.style.display = 'none'; // Asegurar que LAV no aparezca
+                    renderContenedor();
+                }
+            }
             
+            function renderTemperaturas() {
+                 let dataToRender = dataTemperaturas;
+                 let tbody = document.getElementById('temperaturas-tbody');
+                 tbody.innerHTML = '';
+                 
+                 dataToRender.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td data-field="temp">${item.temp || ''}</td>
+                        <td class="left product-sensitive">${item.nevera || ''}</td>
+                        <td class="editable-input"><input type="text" inputmode="numeric" data-field="t2200" data-row="${index}" value="${item.t2200 || ''}"></td>
+                        <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0000" data-row="${index}" value="${item.t0000 || ''}"></td>
+                        <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0200" data-row="${index}" value="${item.t0200 || ''}"></td>
+                        <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0400" data-row="${index}" value="${item.t0400 || ''}"></td>
+                    `;
+                    tr.querySelectorAll('td.editable-input input').forEach(input => {
+                        input.addEventListener('focus', () => { activeInput = input; });
+                        input.addEventListener('blur', () => {
+                            // Revisar si la pérdida de foco es por click en DEF o LAV
+                            if (activeInput === input && !btnDefrost.matches(':hover') && !btnLavado.matches(':hover')) { activeInput = null; }
+                            const field = input.dataset.field;
+                            dataToRender[index][field] = input.value.trim().toUpperCase();
+                            saveAndNotify();
+                        });
+                        input.addEventListener('input', () => {
+                             const value = input.value.trim().toUpperCase();
+                             // Permitir DEF, LAV o temperatura válida
+                             const isValid = value === '' || value === 'DEF' || value === 'LAV' || validateTemperature(value);
+                             // (Lógica de validación visual si fuera necesario)
+                        });
+                    });
+                    tbody.appendChild(tr);
+                 });
+            }
+            
+            function renderRevisiones() {
+                let dataToRender = dataRevisiones;
+                let tbody = document.getElementById('revisiones-tbody');
+                tbody.innerHTML = '';
+                
+                 dataToRender.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td data-field="area">${item.area || ''}</td>
+                        <td class="editable" contenteditable="true" data-field="rev1">${item.rev1 || ''}</td>
+                        <td class="editable" contenteditable="true" data-field="obs1">${item.obs1 || ''}</td>
+                        <td class="editable" contenteditable="true" data-field="rev2">${item.rev2 || ''}</td>
+                        <td class="editable" contenteditable="true" data-field="obs2">${item.obs2 || ''}</td>
+                        <td class="editable" contenteditable="true" data-field="rev3">${item.rev3 || ''}</td>
+                        <td class="editable" contenteditable="true" data-field="obs3">${item.obs3 || ''}</td>
+                    `;
+                    tr.querySelectorAll('td.editable').forEach(td => {
+                        td.addEventListener('blur', () => {
+                            const field = td.dataset.field;
+                            dataToRender[index][field] = td.innerText.trim();
+                            saveAndNotify();
+                        });
+                    });
+                    tbody.appendChild(tr);
+                 });
+            }
+
             function renderChips() {
                 chipsEl.innerHTML = '';
                 DEFAULT_SECCIONES.forEach(s => {
@@ -814,12 +1031,50 @@
             // LÓGICA DEL BOTÓN DEFROST (DEF)
             btnDefrost.addEventListener('click', () => {
                 if (activeInput) {
-                    activeInput.value = 'DEF';
-                    // Dispara manualmente el evento input para guardar y validar 
-                    activeInput.dispatchEvent(new Event('input', { bubbles: true }));
-                    // Para que el foco se pierda después de usar el botón flotante:
-                    activeInput.blur(); 
-                    activeInput = null;
+                    const field = activeInput.dataset.field;
+                    
+                    // DEF aplica a las celdas de tiempo en Temperaturas y Contenedor
+                    if (field === 'temp_reg' || (seccionActiva === 'TEMPERATURAS' && field.startsWith('t'))) {
+                        activeInput.value = 'DEF';
+                        activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        
+                        if (seccionActiva === 'CONTENEDOR') {
+                            saveContenedorData(activeInput);
+                        } else if (seccionActiva === 'TEMPERATURAS') {
+                             const index = activeInput.dataset.row;
+                             dataTemperaturas[index][field] = 'DEF';
+                             saveAndNotify();
+                        }
+                        
+                        activeInput.blur(); 
+                        activeInput = null;
+                    } else {
+                        showToast('DEF solo aplica a celdas de Temperatura.', 'fas fa-info-circle', 2000);
+                    }
+                } else {
+                    showToast('Toque una celda de temperatura primero.', 'fas fa-info-circle', 2000);
+                }
+            });
+
+            // LÓGICA DEL BOTÓN LAVADO (LAV) - NUEVO
+            btnLavado.addEventListener('click', () => {
+                if (activeInput) {
+                    const field = activeInput.dataset.field;
+                    
+                    // LAV aplica solo a las celdas de tiempo en la sección TEMPERATURAS
+                    if (seccionActiva === 'TEMPERATURAS' && field.startsWith('t')) {
+                        activeInput.value = 'LAV';
+                        activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        
+                        const index = activeInput.dataset.row;
+                        dataTemperaturas[index][field] = 'LAV';
+                        saveAndNotify();
+                        
+                        activeInput.blur(); 
+                        activeInput = null;
+                    } else {
+                        showToast('LAV solo aplica a celdas de Temperatura en la sección Temperaturas.', 'fas fa-info-circle', 2500);
+                    }
                 } else {
                     showToast('Toque una celda de temperatura primero.', 'fas fa-info-circle', 2000);
                 }
@@ -832,14 +1087,23 @@
             clearModalConfirmBtn.onclick = () => {
                 if (seccionActiva === 'TEMPERATURAS') {
                     dataTemperaturas = dataTemperaturas.map(item => ({ ...item, t2200: '', t0000: '', t0200: '', t0400: '' }));
-                } else {
+                } else if (seccionActiva === 'REVISIONES') {
                     dataRevisiones = dataRevisiones.map(item => ({ ...item, rev1: '', obs1: '', rev2: '', obs2: '', rev3: '', obs3: '' }));
+                } else if (seccionActiva === 'CONTENEDOR') {
+                    // Borra solo las partes editables del contenedor
+                    dataContenedor[0].rows.forEach(row => { 
+                        row.fecha_rev = '';
+                        row.temp_reg = ''; 
+                        row.seguridad = ''; 
+                    });
                 }
-                // Borra los nombres de los campos
+                
+                // Borra los nombres de los campos de revisión
                 vespertinoNombreInput.value = '';
                 nocturnoNombreInput.value = '';
                 localStorage.removeItem(STORAGE_KEY_VESPERTINO);
                 localStorage.removeItem(STORAGE_KEY_NOCTURNO);
+                
                 saveAndNotify();
                 render();
                 clearModal.style.display = 'none';
@@ -853,7 +1117,7 @@
                 e.preventDefault();
                 termsModal.style.display = 'flex';
             };
-            
+
             openPrivacyModalBtn.onclick = (e) => {
                 e.preventDefault();
                 privacyModal.style.display = 'flex';
@@ -869,8 +1133,17 @@
             // ************ FUNCIÓN DE EXPORTACIÓN CON jsPDF.autoTable() *********
             // ******************************************************************
             btnExport.onclick = () => {
-                if (!dataTemperaturas.length && !dataRevisiones.length) {
-                    showToast('No hay datos para exportar.', 'fas fa-exclamation-triangle', 3000);
+                
+                if (seccionActiva === 'TEMPERATURAS' && !dataTemperaturas.length) {
+                    showToast('No hay datos de temperaturas para exportar.', 'fas fa-exclamation-triangle', 3000);
+                    return;
+                }
+                if (seccionActiva === 'REVISIONES' && !dataRevisiones.length) {
+                    showToast('No hay datos de revisiones para exportar.', 'fas fa-exclamation-triangle', 3000);
+                    return;
+                }
+                if (seccionActiva === 'CONTENEDOR' && !dataContenedor.length) {
+                    showToast('No hay datos de contenedor para exportar.', 'fas fa-exclamation-triangle', 3000);
                     return;
                 }
 
@@ -890,65 +1163,157 @@
 
                         const vespertinoNombre = vespertinoNombreInput.value.trim();
                         const nocturnoNombre = nocturnoNombreInput.value.trim();
-                        
+
                         const reviewDateValue = reviewDateInput.value;
-                        let formattedReviewDate = 'N/A';
-                        if (reviewDateValue) {
-                            const [y, m, d] = reviewDateValue.split('-');
-                            formattedReviewDate = `${d}/${m}/${y}`;
-                        } else {
-                            const today = new Date();
-                            formattedReviewDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
-                        }
+                        let formattedReviewDate = formatYyyyMmDdToDmy(reviewDateValue) || 
+                            formatDateToDmy(new Date()); // Si el input está vacío, usa la fecha actual
 
-                        const PDF_MAIN_TITLE = "REVISIÓN DE INSTALACIONES Y TEMPERATURAS DE NEVERAS";
+                        // Función para añadir el encabezado del documento
+                        const addHeader = (doc, title, startY = 15) => { 
+                            let yPos = startY;
 
-                        const addHeaderAndFooter = (doc) => { 
-                            let yPos = 15;
-                            
-                            if (doc.internal.getNumberOfPages() === 1) {
-                                doc.setFontSize(16).setFont('helvetica', 'bold');
-                                doc.text("GRUPO RIBA SMITH", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
-                                yPos += 6;
-                                doc.setFontSize(12).setFont('helvetica', 'normal');
-                                doc.text("R/S CHITRÉ SELECTO", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
-                                yPos += 5;
-                                
-                                doc.setFontSize(12).setFont('helvetica', 'bold');
-                                const titleLines = doc.splitTextToSize(PDF_MAIN_TITLE, doc.internal.pageSize.width - marginX * 2);
-                                doc.text(titleLines, doc.internal.pageSize.width / 2, yPos, { align: 'center' });
-                                yPos += (titleLines.length * 5) + 3;
-                                
-                                doc.setFontSize(10).setFont('helvetica', 'bold'); 
-                                const detailHeight = 5;
+                            doc.setFontSize(16).setFont('helvetica', 'bold');
+                            doc.text("GRUPO RIBA SMITH", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                            yPos += 6;
+                            doc.setFontSize(12).setFont('helvetica', 'normal');
+                            doc.text("R/S CHITRÉ SELECTO", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                            yPos += 5;
 
-                                doc.text(`Fecha de Revisión:`, marginX, yPos);
-                                doc.text(`Revisión Vespertina:`, doc.internal.pageSize.width / 2, yPos, { align: 'center' });
-                                doc.text(`Revisión Nocturna:`, doc.internal.pageSize.width - marginX, yPos, { align: 'right' });
+                            doc.setFontSize(12).setFont('helvetica', 'bold');
+                            const titleLines = doc.splitTextToSize(title, doc.internal.pageSize.width - marginX * 2);
+                            doc.text(titleLines, doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                            yPos += (titleLines.length * 5) + 3;
 
-                                yPos += detailHeight - 1; 
-                                
-                                doc.setFontSize(10).setFont('helvetica', 'normal'); 
-                                doc.text(formattedReviewDate, marginX, yPos);
-                                doc.text(vespertinoNombre || "________________", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
-                                doc.text(nocturnoNombre || "________________", doc.internal.pageSize.width - marginX, yPos, { align: 'right' });
-                                
-                                yPos += detailHeight + 5;
-                            }
-                            
+                            doc.setFontSize(10).setFont('helvetica', 'bold'); 
+                            const detailHeight = 5;
+
+                            doc.text(`Fecha de Revisión:`, marginX, yPos);
+                            doc.text(`Revisión Vespertina:`, doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                            doc.text(`Revisión Nocturna:`, doc.internal.pageSize.width - marginX, yPos, { align: 'right' });
+
+                            yPos += detailHeight - 1; 
+
+                            doc.setFontSize(10).setFont('helvetica', 'normal'); 
+                            doc.text(formattedReviewDate, marginX, yPos); // Usa el nuevo formato
+                            doc.text(vespertinoNombre || "________________", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                            doc.text(nocturnoNombre || "________________", doc.internal.pageSize.width - marginX, yPos, { align: 'right' });
+
+                            yPos += detailHeight + 5;
+                            return yPos;
+                        };
+                        
+                        // Función para añadir pie de página
+                        const addFooter = (doc, data) => {
                             doc.setFontSize(8).setFont('helvetica', 'normal');
-                            doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
-                            
                             const footerText = 'Powered by Rafael Ramos';
                             doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
                             
-                            return (doc.internal.getNumberOfPages() === 1) ? yPos : 15;
+                            // Numeración de página
+                            doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
                         };
 
-                        // --- 2. GENERAR TABLA DE TEMPERATURAS (AJUSTADA) ---
-                        if (dataTemperaturas.length) {
-                            let currentY = addHeaderAndFooter(doc);
+                        let currentY = 0; 
+                        let PDF_MAIN_TITLE = '';
+
+                        // *** LÓGICA DE GENERACIÓN: CONTENEDOR SOLO ***
+                        if (seccionActiva === 'CONTENEDOR') {
                             
+                            PDF_MAIN_TITLE = "CONTROL DE TEMPERATURA DE CONTENEDOR";
+                            currentY = addHeader(doc, PDF_MAIN_TITLE);
+                            const contData = dataContenedor[0]; 
+                             
+                            const contHeaders = [
+                                { header: 'N° DE CONT.', dataKey: 'cont_num' },
+                                { header: 'TEMP OBJETIVO', dataKey: 'cont_temp_target' },
+                                { header: 'FECHA REVISIÓN', dataKey: 'fecha_rev' }, // NUEVO ORDEN
+                                { header: 'HORA REVISIÓN', dataKey: 'hora' },      // NUEVO ORDEN
+                                { header: 'TEMP. REG.', dataKey: 'temp_reg' },
+                                { header: 'SEGURIDAD', dataKey: 'seguridad' },
+                            ];
+                            
+                            const contBody = contData.rows.map((row, index) => {
+                                // Convertir la fecha guardada (YYYY-MM-DD) a (DD/MM/YYYY) para el PDF
+                                const formattedFechaRev = formatYyyyMmDdToDmy(row.fecha_rev); 
+
+                                const containerRow = [
+                                    formattedFechaRev || '',  // 1. FECHA REVISIÓN (Formato DD/MM/YYYY)
+                                    row.hora,                 // 2. HORA REVISIÓN
+                                    row.temp_reg || '',       // 3. TEMP. REG.
+                                    row.seguridad || '',      // 4. SEGURIDAD
+                                ];
+                                
+                                // Insertar el Contenedor y la Temperatura Objetivo en la primera fila.
+                                if (index === 0) {
+                                    containerRow.unshift(contData.cont_temp_target);
+                                    containerRow.unshift(contData.cont_num);
+                                }
+                                
+                                return containerRow;
+                            });
+                            
+                            // *** APLICACIÓN DEL ROWSPAN EN LA MATRIZ DE DATOS ***
+                            if (contBody.length > 0) {
+                                const rowSpanValue = contBody.length;
+                                // Columna N° DE CONT. (Índice 0)
+                                contBody[0][0] = { content: contData.cont_num, rowSpan: rowSpanValue, styles: { valign: 'middle' } };
+                                // Columna TEMP OBJETIVO (Índice 1)
+                                contBody[0][1] = { content: contData.cont_temp_target, rowSpan: rowSpanValue, styles: { valign: 'middle' } };
+                            }
+                            // *** FIN APLICACIÓN DEL ROWSPAN ***
+
+
+                            doc.autoTable({
+                                startY: currentY,
+                                head: [contHeaders.map(h => h.header)],
+                                body: contBody,
+                                theme: 'grid',
+                                styles: { fontSize: 8, cellPadding: 2, halign: 'center' },
+                                headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], fontStyle: 'bold' },
+                                columnStyles: {
+                                    0: { cellWidth: 25 }, // N° CONT
+                                    1: { cellWidth: 25 }, // TEMP OBJETIVO
+                                    2: { cellWidth: 25 }, // FECHA REVISION (Aumentado ancho para DD/MM/YYYY)
+                                    3: { cellWidth: 20 }, // HORA REVISION
+                                    4: { cellWidth: 35 }, // TEMP. REG.
+                                    5: { cellWidth: 40 }, // SEGURIDAD
+                                },
+                                tableWidth: 'wrap', 
+                                margin: { left: marginX, right: marginX, top: 15, bottom: 15 },
+                                didDrawPage: (data) => {
+                                    addFooter(doc, data);
+                                }
+                            });
+                            
+                            currentY = doc.autoTable.previous.finalY;
+                            
+                            // AÑADIR OBSERVACIONES DEL CONTENEDOR (DESPUÉS DE LA TABLA)
+                            doc.setFontSize(10).setFont('helvetica', 'bold');
+                            currentY += 5;
+                            doc.text("Observación:", marginX, currentY);
+                            currentY += 5;
+
+                            doc.setFontSize(8).setFont('helvetica', 'normal');
+                            const obs1 = '1- Cuando el contenedor mantiene la luz roja donde dice DEFROST es porque se mantiene en descongelamiento y la temperatura debe llegar a -16° y luego ir bajando.';
+                            const obs2 = '2- El personal cuando proceda a introducir o a retirar mercancía del contenedor deberá apagarlo y cuando terminen de introducir o retirar mercancía nuevamente encenderlo.';
+                            
+                            const obs1Lines = doc.splitTextToSize(obs1, doc.internal.pageSize.width - marginX * 2);
+                            doc.text(obs1Lines, marginX, currentY);
+                            currentY += (obs1Lines.length * 4);
+                            
+                            const obs2Lines = doc.splitTextToSize(obs2, doc.internal.pageSize.width - marginX * 2);
+                            doc.text(obs2Lines, marginX, currentY);
+                            currentY += (obs2Lines.length * 4);
+
+                        }
+                        
+                        // *** LÓGICA DE GENERACIÓN: TEMPERATURAS Y REVISIONES ***
+                        if (seccionActiva === 'TEMPERATURAS' || seccionActiva === 'REVISIONES') {
+                            
+                            // 1. Añadir el encabezado para el reporte combinado
+                            PDF_MAIN_TITLE = "REPORTE DE REVISIÓN Y TEMPERATURAS";
+                            currentY = addHeader(doc, PDF_MAIN_TITLE);
+                            
+                            // 2. Generar Tabla de Temperaturas
                             const tempHeaders = [
                                 { header: 'TEMP', dataKey: 'temp' },
                                 { header: 'NEVERAS', dataKey: 'nevera' },
@@ -957,52 +1322,41 @@
                                 { header: '02:00', dataKey: 't0200' },
                                 { header: '04:00', dataKey: 't0400' },
                             ];
-                            
                             const tempBody = dataTemperaturas.map(d => [
                                 d.temp || '', d.nevera || '', d.t2200 || '', d.t0000 || '', d.t0200 || '', d.t0400 || ''
                             ]);
-
+                            
                             doc.autoTable({
-                                startY: currentY,
-                                head: [tempHeaders.map(h => h.header)],
-                                body: tempBody,
-                                theme: 'grid',
+                                startY: currentY, 
+                                head: [tempHeaders.map(h => h.header)], 
+                                body: tempBody, 
+                                theme: 'grid', 
                                 styles: { fontSize: 8, cellPadding: 2, halign: 'center' },
                                 headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], fontStyle: 'bold' },
-                                columnStyles: {
+                                columnStyles: { 
                                     0: { cellWidth: 15 }, 
-                                    1: { cellWidth: 60, halign: 'left' }, 
-                                    2: { cellWidth: 25 }, 
-                                    3: { cellWidth: 25 }, 
-                                    4: { cellWidth: 25 }, 
-                                    5: { cellWidth: 25 }, 
+                                    // Aumentamos ligeramente el ancho de NEVERAS a 65
+                                    1: { cellWidth: 65, halign: 'left' }, 
+                                    2: { cellWidth: 20 }, // Reducimos las horas
+                                    3: { cellWidth: 20 }, // Reducimos las horas
+                                    4: { cellWidth: 20 }, // Reducimos las horas
+                                    5: { cellWidth: 20 }  // Reducimos las horas
                                 },
                                 tableWidth: 'wrap', 
                                 margin: { left: marginX, right: marginX, top: 15, bottom: 15 }, 
-                                
                                 didDrawPage: (data) => {
-                                    doc.setFontSize(8).setFont('helvetica', 'normal');
-                                    const footerText = 'Powered by Rafael Ramos';
-                                    doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
-                                    
-                                    if (data.pageNumber > 1) { 
-                                        doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
-                                        data.cursor.y = 15;
-                                    }
+                                    addFooter(doc, data);
                                 }
                             });
-                        }
+                            currentY = doc.autoTable.previous.finalY;
 
-                        // --- 3. GENERAR TABLA DE REVISIONES (AJUSTADA Y CORREGIDA) ---
-                        if (dataRevisiones.length) {
-                            // Añadir página si ya se generó la de temperaturas o si no hay temperaturas.
-                            if (doc.internal.getNumberOfPages() > 1 || dataTemperaturas.length > 0) {
-                                 doc.addPage();
-                                 let currentY = addHeaderAndFooter(doc); 
-                            } else {
-                                let currentY = addHeaderAndFooter(doc);
-                            }
+                            // 3. Generar Tabla de Revisiones
                             
+                            // *** CAMBIO CLAVE: Forzar la nueva página para la tabla de Revisiones ***
+                            doc.addPage(); 
+                            currentY = 15; 
+                            // *** FIN CAMBIO CLAVE ***
+
                             const revHeaders = [
                                 { header: 'PUERTAS Y/O ÁREAS', dataKey: 'area' },
                                 { header: 'REV. N°1', dataKey: 'rev1' },
@@ -1012,48 +1366,37 @@
                                 { header: 'REV. N°3', dataKey: 'rev3' },
                                 { header: 'OBSERVACIÓN', dataKey: 'obs3' },
                             ];
-                            
                             const revBody = dataRevisiones.map(d => [
                                 d.area || '', d.rev1 || '', d.obs1 || '', d.rev2 || '', d.obs2 || '', d.rev3 || '', d.obs3 || ''
                             ]);
                             
-                            let revPageCount = 0; 
-                            
                             doc.autoTable({
-                                startY: doc.autoTable.previous.finalY > 0 ? doc.autoTable.previous.finalY + 5 : 20,
-                                head: [revHeaders.map(h => h.header)],
-                                body: revBody,
-                                theme: 'grid',
+                                startY: currentY, 
+                                head: [revHeaders.map(h => h.header)], 
+                                body: revBody, 
+                                theme: 'grid', 
                                 styles: { fontSize: 8, cellPadding: 2, halign: 'center' },
                                 headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], fontStyle: 'bold' },
-                                // *** AJUSTES EN EL ANCHO DE COLUMNA PARA EVITAR EL ERROR '5 units width could not fit page' ***
-                                columnStyles: {
+                                columnStyles: { 
                                     0: { cellWidth: 40, halign: 'left' }, 
                                     1: { cellWidth: 14 }, 
                                     2: { cellWidth: 32 }, 
                                     3: { cellWidth: 14 }, 
                                     4: { cellWidth: 32 }, 
                                     5: { cellWidth: 14 }, 
-                                    6: { cellWidth: 32 }, 
+                                    6: { cellWidth: 32 } 
                                 },
                                 tableWidth: 'wrap', 
                                 margin: { left: marginX, right: marginX, top: 15, bottom: 15 },
-                                
                                 didDrawPage: (data) => {
-                                    revPageCount++; 
-                                    doc.setFontSize(8).setFont('helvetica', 'normal');
-                                    const footerText = 'Powered by Rafael Ramos';
-                                    doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
-                                    
-                                    if (revPageCount > 1) {
-                                        doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
-                                        data.cursor.y = 15; 
-                                    }
+                                    addFooter(doc, data);
                                 }
                             });
                         }
                         
-                        doc.save(`Revision_y_Temperatura_${formattedReviewDate.replace(/\//g, '-')}.pdf`);
+                        // **** FIN DE LÓGICA DE CONTENIDO DINÁMICO ****
+
+                        doc.save(`Revision_y_Temperatura_${seccionActiva}_${formattedReviewDate.replace(/\//g, '-')}.pdf`);
 
                         hideToast(loadingToast);
                         showToast('¡PDF guardado con éxito!', 'fas fa-check-circle', 4000);
@@ -1068,18 +1411,11 @@
             // ************ FIN DE FUNCIÓN CON jsPDF.autoTable() ****************
             // ******************************************************************
 
-            function getTodayDateFormattedForInput() {
-                const today = new Date();
-                const year = today.getFullYear();
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const day = String(today.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            }
 
             function openNav() {
                 document.getElementById("mySidebar").style.width = "250px";
             }
-            
+
             function closeNav() {
                 document.getElementById("mySidebar").style.width = "0";
             }
@@ -1088,7 +1424,7 @@
                 // Esconde la pantalla de inicio
                 setTimeout(() => { document.getElementById("splash").style.opacity = "0"; }, 1500);
                 setTimeout(() => { document.getElementById("splash").style.display = "none"; }, 2000);
-                
+
                 // Carga la fecha y los nombres guardados
                 if (!reviewDateInput.value) {
                     reviewDateInput.value = getTodayDateFormattedForInput();
