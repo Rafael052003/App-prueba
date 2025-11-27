@@ -553,7 +553,7 @@
             <span class="close-btn">&times;</span>
             <i class="fas fa-eraser modal-icon"></i>
             <h2>¿Borrar Datos?</h2>
-            <p>Esta acción eliminará todos los datos de la sección activa (**<span id="active-section-name"></span>**) y los nombres de los revisores.</p>
+            <p>Esta acción eliminará todos los datos de la sección activa (**<span id="active-section-name"></span>**).</p>
             <div class="modal-actions">
                 <button id="clearModalConfirmBtn" class="action-btn danger">Confirmar</button>
                 <button id="clearModalCancelBtn" class="action-btn">Cancelar</button>
@@ -743,15 +743,24 @@
 
             let saveTimer = null;
             function saveAndNotify() {
+                // MODIFICACIÓN DE CÓDIGO: Función de guardado para permitir guardado inmediato o con retraso
                 clearTimeout(saveTimer);
-                saveTimer = setTimeout(() => {
+                const saveOperation = () => {
                     localStorage.setItem(STORAGE_KEY_TEMPERATURAS, JSON.stringify(dataTemperaturas));
                     localStorage.setItem(STORAGE_KEY_REVISIONES, JSON.stringify(dataRevisiones));
                     localStorage.setItem(STORAGE_KEY_CONTENEDOR, JSON.stringify(dataContenedor)); 
                     localStorage.setItem(STORAGE_KEY_VESPERTINO, vespertinoNombreInput.value);
                     localStorage.setItem(STORAGE_KEY_NOCTURNO, nocturnoNombreInput.value);
                     localStorage.setItem('active_section', seccionActiva);
-                }, 300);
+                };
+                
+                // Si se llama con el argumento true (p. ej., saveAndNotify(true)), se ejecuta inmediatamente.
+                if (arguments[0] === true) { 
+                    saveOperation();
+                } else {
+                    // Si se llama normalmente (input blur/change), usa el retardo.
+                    saveTimer = setTimeout(saveOperation, 300);
+                }
             }
             
             // =========================================================================
@@ -1095,13 +1104,11 @@
                     });
                 }
                 
-                // Borra los nombres de los campos de revisión
-                vespertinoNombreInput.value = '';
-                nocturnoNombreInput.value = '';
-                localStorage.removeItem(STORAGE_KEY_VESPERTINO);
-                localStorage.removeItem(STORAGE_KEY_NOCTURNO);
+                // MODIFICACIÓN DE CÓDIGO: Se quita la limpieza de nombres de revisores 
+                // para cumplir con la nueva leyenda del pop-up.
+                // Los campos de revisores ahora DEBEN borrarse manualmente si se desea.
                 
-                saveAndNotify();
+                saveAndNotify(true); // Guardar inmediatamente
                 render();
                 clearModal.style.display = 'none';
             };
@@ -1129,6 +1136,10 @@
             // ******************************************************************
             btnExport.onclick = () => {
                 
+                // MODIFICACIÓN DE CÓDIGO: Forzar el guardado inmediato (cancelando el timer de 300ms) 
+                // para asegurar que los últimos datos del input activo se reflejen en el PDF.
+                saveAndNotify(true); 
+
                 if (seccionActiva === 'TEMPERATURAS' && !dataTemperaturas.length) {
                     showToast('No hay datos de temperaturas para exportar.', 'fas fa-exclamation-triangle', 3000);
                     return;
