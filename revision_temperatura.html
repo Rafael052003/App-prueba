@@ -3,806 +3,1447 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Llaves - Con Firma Digital</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script> 
-    
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script> 
-
+    <title>Revision y Temperatura</title>
     <link rel="manifest" href="manifest.json">
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        /* New Discreet Corporate Palette & Styles */
+        :root {
+            --primary-color: #2c3e50; /* Deep Blue-Grey */
+            --secondary-color: #7f8c8d; /* Muted Grey */
+            --accent-color: #3498db; /* Corporate Blue */
+            --bg-light: #f4f7f9; /* Lighter Grey-Blue Background */
+            --bg-card: #ffffff; /* White Card Background */
+            --border-color: #e0e6ea; /* Subtle Border */
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c4c;
+            --info-color: #9b59b6; /* New color for LAV */
+            --font-main: 'Poppins', sans-serif;
+        }
+
+        /* General & Resets */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #eef2ff; /* Fondo muy suave azul */
+            font-family: var(--font-main);
+            background: var(--bg-light);
+            color: var(--primary-color);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiasing;
+            -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 80px; /* Space for the fixed footer */
         }
-        /* Estilos generales de la aplicación */
-        .app-container {
-            @apply max-w-4xl mx-auto p-4 md:p-8;
+        .main-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            position: relative;
         }
-        .card {
-            @apply bg-white p-6 rounded-2xl shadow-xl border border-indigo-100/50 transition-all duration-300;
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 20px auto;
+                padding: 15px;
+            }
         }
-        .btn-primary {
-            @apply px-6 py-3 font-bold text-white bg-indigo-600 rounded-xl shadow-lg hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-indigo-300;
+
+        /* Mobile Specific Adjustments */
+        @media (max-width: 600px) {
+            .title-group h1 { font-size: 18px; }
+            .title-group h2 { font-size: 14px; }
+            #main-title { font-size: 16px; margin-top: 10px; }
+            .action-btn { font-size: 12px; padding: 10px 15px; }
+            .chip { font-size: 12px; padding: 8px 12px; }
+            th, td { padding: 8px; font-size: 12px; }
+            .header-info { grid-template-columns: 1fr; gap: 10px; }
+            .header-row label { font-size: 12px; }
+            .header-row input { font-size: 14px; padding: 10px 12px; }
+            .hamburger-menu { top: 20px; left: 20px; font-size: 24px; display: block; }
+            #splash h2 { font-size: 18px; }
+            
+            /* Ajuste de botones flotantes en móvil */
+            #btnDefrost { bottom: 85px; right: 15px; font-size: 14px; padding: 12px 16px; }
+            #btnLavado { bottom: 20px; right: 15px; font-size: 14px; padding: 12px 16px; }
         }
-        .btn-success {
-            @apply px-4 py-2 font-semibold text-white bg-green-600 rounded-xl hover:bg-green-700 transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-green-300;
+
+        /* Splash Screen */
+        #splash {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--primary-color); color: #fff;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999;
+            transition: opacity 0.7s ease-out;
+            text-align: center;
         }
-        .btn-report {
-            @apply px-4 py-2 font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-red-300;
+        #splash img { width: 150px; margin-bottom: 20px; animation: bounceIn 1s ease-out; }
+        #splash h2 { font-weight: 700; font-size: 32px; margin-bottom: 10px; }
+        #splash p { font-size: 14px; opacity: 0.8; }
+        @keyframes bounceIn {
+            0%{opacity:0;transform:scale(0.8);}
+            60%{opacity:1;transform:scale(1.1);}
+            100%{transform:scale(1);}
         }
+
+        /* Header & Titles */
+        header { text-align: center; margin-bottom: 40px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); position: relative; }
+        .title-group h1 { font-size: 24px; font-weight: 700; color: var(--primary-color); text-transform: uppercase; margin: 0; }
+        .title-group h2 { font-size: 16px; font-weight: 500; color: var(--secondary-color); margin: 5px 0 0; }
+        #main-title { font-size: 20px; font-weight: 600; margin-top: 15px; }
+
+        .hamburger-menu {
+            display: none;
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .hamburger-menu i {
+            color: var(--primary-color);
+            font-size: 28px;
+        }
+
+        /* Sidebar Menu */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 99;
+            top: 0;
+            left: 0;
+            background-color: var(--primary-color);
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+        .sidebar a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 20px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: var(--accent-color);
+        }
+        .sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+            color: white;
+        }
+
+        /* Input Section */
+        .header-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .header-row { display: flex; flex-direction: column; }
+        .header-row label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .header-row input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--bg-light);
+            transition: all 0.3s ease;
+        }
+        .header-row input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        /* Chips & Actions */
+        .controls-container { display: flex; flex-direction: column; gap: 16px; margin-bottom: 30px; }
+        .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 30px; }
+        .action-btn {
+            background: var(--accent-color);
+            color: white;
+            border: 0;
+            padding: 14px 28px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .action-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); }
+        .action-btn.danger { background: var(--danger-color); }
+        .action-btn.danger:hover { background: #c0392b; }
+        .action-btn.success { background: var(--success-color); }
+        .action-btn.success:hover { background: #27ae60; }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .chip {
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            background: var(--bg-light);
+            color: var(--secondary-color);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .chip.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .chip:hover { transform: translateY(-1px); }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .main-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background: var(--bg-card);
+        }
+        /* Estilo para la nueva tabla de Contenedores (evitar centrado) */
+        .container-temp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background: var(--bg-card);
+        }
+        .container-temp-table th, .container-temp-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: center;
+            vertical-align: top;
+        }
+        .container-temp-table th {
+            background: var(--primary-color);
+            color: white;
+        }
+        .container-temp-table .fixed-hours {
+            font-weight: 600; /* Resalta las horas fijas */
+            background-color: #fcfcfc;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+        th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        td {
+            cursor: default;
+        }
+
+        /* New style for input within editable cells */
+        td.editable-input {
+            padding: 0;
+        }
+        td.editable-input input {
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            border: none;
+            outline: none;
+            font-family: var(--font-main);
+            font-size: 14px;
+            text-align: center;
+            background: transparent;
+            color: var(--primary-color);
+        }
+        td.editable-input input:focus {
+            background-color: var(--bg-light);
+            box-shadow: inset 0 0 0 2px var(--accent-color);
+        }
+
+        .main-table tbody tr:hover { background-color: #f5f8fb; }
+        .main-table tbody tr:last-child td { border-bottom: none; }
+        td.left { text-align: left; }
+
+        /* Modal */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 2000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.6); 
+            animation: fadeIn 0.3s;
+            justify-content: center; 
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: auto; 
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 80vh; 
+            overflow-y: auto; 
+        }
+        .modal-content.large-text {
+            max-width: 600px;
+            text-align: left;
+            padding: 25px 40px;
+        }
+        .modal-content h2 { color: var(--primary-color); font-size: 24px; margin-bottom: 10px; text-align: center; }
+        .modal-content p, .modal-content li { color: var(--secondary-color); font-size: 14px; line-height: 1.6; }
+        .modal-content p { margin-bottom: 20px; }
+        .modal-content ul { padding-left: 20px; margin-bottom: 20px; }
+        .modal-content li { margin-bottom: 10px; }
+        .modal-icon { font-size: 48px; color: var(--danger-color); margin-bottom: 20px; }
+        .modal-actions { display: flex; justify-content: space-around; gap: 15px; }
+        .modal-actions button { flex: 1; }
+        .close-btn { color: var(--secondary-color); position: absolute; top: 15px; right: 25px; font-size: 28px; cursor: pointer; transition: color 0.2s; }
+        .close-btn:hover, .close-btn:focus { color: var(--primary-color); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px 0;
+            font-size: 12px;
+            color: var(--secondary-color);
+        }
+        .footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .footer a:hover {
+            color: var(--primary-color);
+        }
+        .footer .divider {
+            color: var(--secondary-color);
+            margin: 0 5px;
+        }
+
+        /* Toast Notification Styles - MODIFICADO PARA PARTE SUPERIOR */
+        #toast-container {
+            position: fixed;
+            top: 30px; /* POSICIÓN SUPERIOR */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column; /* Apilar hacia abajo */
+            align-items: center;
+        }
+        .toast {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px; /* Margen inferior para apilamiento */
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            transform: translateY(-20px); /* Viene desde arriba */
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            min-width: 250px; /* Asegura un ancho mínimo */
+            justify-content: center;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ESTILO PARA LOS BOTONES FLOTANTES */
+        .floating-btn {
+            position: fixed;
+            z-index: 1000;
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 16px;
+            padding: 15px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: transform 0.2s, background-color 0.2s;
+            text-decoration: none; /* Asegura que no tenga estilo de enlace si se usa la clase */
+        }
+
+        /* Botón DEFROST (DEF) */
+        #btnDefrost {
+            bottom: 20px;
+            right: 120px; /* Mover a la izquierda para hacer espacio para LAV */
+            background-color: var(--warning-color); 
+        }
+        #btnDefrost:hover {
+            background-color: #e67e22; 
+            transform: scale(1.05);
+        }
+        #btnDefrost:active {
+            transform: scale(0.95);
+        }
+
+        /* Botón LAVADO (LAV) - NUEVO */
+        #btnLavado {
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--info-color); /* Color distintivo */
+            color: white;
+        }
+        #btnLavado:hover {
+            background-color: #8e44ad; /* Tono más oscuro */
+            transform: scale(1.05);
+        }
+        #btnLavado:active {
+            transform: scale(0.95);
+        }
+
+        @media (max-width: 600px) {
+            #btnDefrost { right: 15px; bottom: 85px; }
+            #btnLavado { right: 15px; bottom: 20px; }
+        }
+
     </style>
 </head>
 <body>
-
-    <div id="login-modal" class="fixed inset-0 bg-indigo-900 bg-opacity-95 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm transform transition-transform duration-500 ease-out">
-            <h3 class="text-3xl font-extrabold mb-4 text-indigo-700 text-center">Acceso de Seguridad</h3>
-            <p class="text-gray-600 mb-6 text-center">Seleccione su nombre e ingrese su contraseña.</p>
-
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700">Nombre de Agente de Seguridad</label>
-                    <select id="username" name="username" required 
-                           class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white">
-                        <option value="">-- Seleccione su Nombre --</option>
-                        <option value="Rafael Ramos">Rafael Ramos</option>
-                        <option value="José Guevara">José Guevara</option>
-                        <option value="Ariel Bernal">Ariel Bernal</option>
-                        <option value="Oriel Aizprua">Oriel Aizprua</option>
-                        <option value="Leandro Pérez">Leandro Pérez</option>
-                        <option value="Samuel Reyes">Samuel Reyes</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
-                    <input type="password" id="password" name="password" required 
-                           class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500"
-                           placeholder="Contraseña">
-                </div>
-
-                <div id="login-error" class="hidden text-red-600 text-sm font-semibold">Credenciales incorrectas.</div>
-
-                <button type="submit" class="btn-primary w-full mt-6">
-                    Iniciar Sesión
-                </button>
-            </form>
-        </div>
+    <div id="splash">
+        <img src="icon-192.png" alt="Logo">
+        <h2>REVISIÓN Y</h2>
+        <h2>TEMPERATURA</h2>
+        <p>Powered by Rafael Ramos</p>
+        <p>Versión 1.0</p>
     </div>
-    <div id="main-app-content" class="app-container hidden">
 
-        <header class="text-center py-8 mb-4 bg-indigo-700 text-white rounded-b-3xl shadow-2xl flex justify-between items-center px-6">
-            <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight">Control de Llaves</h1>
-            <button id="logout-btn" onclick="handleLogout()" class="px-3 py-1.5 font-semibold text-xs bg-white text-indigo-700 rounded-lg hover:bg-gray-100 transition-colors">
-                Cerrar Sesión
-            </button>
+    <div class="main-container">
+        <header>
+            <div id="mySidebar" class="sidebar">
+                <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                <a href="#">Menú</a>
+            </div>
+            <div class="hamburger-menu" onclick="openNav()">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div class="title-group">
+                <h1>GRUPO RIBA SMITH</h1>
+                <h2>R/S CHITRÉ SELECTO</h2>
+                <h1 id="main-title">REVISIÓN DE INSTALACIONES</h1> 
+            </div>
         </header>
 
-        <div class="mb-6 flex justify-center">
-            <button id="end-day-report-btn" onclick="generateDailyReportPdf()" class="btn-report flex items-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M14 3v4a1 1 0 0 0 1 1h4"></path><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"></path><line x1="10" y1="13" x2="14" y2="13"></line><line x1="12" y1="17" x2="12" y2="17"></line></svg>
-                <span>Terminar Día</span>
-            </button>
-        </div>
-
-        <div id="message-container"></div>
-        <div id="auth-status" class="mb-10 card text-sm">
-            <p class="flex items-center justify-between">
-                ID de Seguridad Activo: 
-                <span id="security-id" class="font-mono text-xs bg-indigo-100 text-indigo-700 p-2 rounded-lg font-bold"></span>
-            </p>
-        </div>
-
-        <div id="checkout-section" class="card mb-12">
-            <h2 class="text-2xl font-bold text-indigo-700 mb-4 pb-2 border-b border-indigo-100">1. Registrar Entrega de Llave</h2>
-
-            <form id="checkout-form" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="userName" class="block text-sm font-medium text-gray-700">Usuario que Solicita</label>
-                        <select id="userName" name="userName" required class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white">
-                            <option value="">-- Seleccione Usuario --</option>
-                            <option value="Rafael Ramos">Rafael Ramos</option>
-                            <option value="José Guevara">José Guevara</option>
-                            <option value="Ariel Bernal">Ariel Bernal</option>
-                            <option value="Oriel Aizprua">Oriel Aizprua</option>
-                            <option value="Leandro Pérez">Leandro Pérez</option>
-                            <option value="Samuel Reyes">Samuel Reyes</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="keyRequested" class="block text-sm font-medium text-gray-700">Llave Solicitada</label>
-                        <select id="keyRequested" name="keyRequested" required class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white">
-                            <option value="">-- Seleccione Activo --</option>
-                            <option value="Deposito">Deposito</option>
-                            <option value="Contenedor">Contenedor</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label for="checkoutLocation" class="block text-sm font-medium text-gray-700">Departamento</label>
-                    <select id="checkoutLocation" name="checkoutLocation" required class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white">
-                        <option value="">-- Seleccione Departamento --</option>
-                        <option value="Rimith">Rimith</option>
-                        <option value="Nevera">Nevera</option>
-                        <option value="Panaderia">Panadería</option>
-                        <option value="Estanteria">Estantería</option>
-                        <option value="Sanidad">Sanidad</option>
-                        <option value="Recibo">Recibo</option>
-                    </select>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Firma del Solicitante (Entregado)</label>
-                    <div class="border border-gray-300 rounded-xl bg-gray-50 p-1 h-40">
-                        <canvas id="signature-pad-checkout" width="400" height="150" class="w-full h-full bg-white rounded-lg cursor-crosshair border border-dashed border-indigo-200"></canvas>
-                    </div>
-                    <button type="button" id="clear-signature-checkout" class="mt-1 px-3 py-1 text-xs font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors">Borrar Firma</button>
-                </div>
-                <div>
-                    <label for="checkoutObservation" class="block text-sm font-medium text-gray-700">Observación (Opcional)</label>
-                    <textarea id="checkoutObservation" name="checkoutObservation" rows="2" class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-                </div>
-
-                <button type="submit" id="checkout-submit-btn" class="btn-primary w-full mt-6">
-                    <span id="submit-text">Registrar Entrega</span>
-                    <span id="submit-loading" class="hidden flex items-center justify-center">
-                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        Guardando...
-                    </span>
-                </button>
-            </form>
-        </div>
-
-        <div id="pending-section" class="card">
-            <h2 class="text-2xl font-bold text-indigo-700 mb-6 pb-2 border-b border-indigo-100">2. Llaves Pendientes de Devolución</h2>
-
-            <div id="key-list-container">
-                <div id="key-list-loading" class="text-center py-8 text-gray-500">
-                    <svg class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"></svg>
-                    Cargando historial de llaves...
-                </div>
-                <div id="pending-keys-list" class="space-y-4">
-                    </div>
-                <div id="key-list-empty" class="hidden text-center py-8 text-gray-500">
-                    <p class="text-lg">🎉 ¡Todas las llaves han sido devueltas! No hay registros pendientes.</p>
-                </div>
+        <div class="header-info">
+            <div class="header-row">
+                <label for="review-date">Fecha de Revisión:</label>
+                <input type="date" id="review-date"> 
+            </div>
+            <div class="header-row">
+                <label for="vespertino-nombre">Revisión Vespertina:</label>
+                <input type="text" id="vespertino-nombre" placeholder="Nombre (turno vespertino)">
+            </div>
+            <div class="header-row">
+                <label for="nocturno-nombre">Revisión Nocturna:</label>
+                <input type="text" id="nocturno-nombre" placeholder="Nombre (turno nocturno)">
             </div>
         </div>
 
-        <div id="return-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50">
-            <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md">
-                <h3 class="text-xl font-bold mb-4 text-indigo-700 border-b pb-2">Confirmar Devolución</h3>
-                <p class="text-gray-600 mb-4">Confirmar devolución de: <strong id="modal-key-name" class="text-indigo-600 font-extrabold"></strong>.</p>
-                <p class="text-gray-500 text-sm mb-4">Solicitada por: <span id="modal-user-name" class="font-semibold"></span></p>
-
-                <form id="return-form" class="space-y-4">
-                    <div>
-                        <label for="returnLocation" class="block text-sm font-medium text-gray-700">Lugar de Devolución</label>
-                        <select id="returnLocation" name="returnLocation" required class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm p-3 focus:ring-green-500 focus:border-green-500 appearance-none bg-white">
-                            <option value="">-- Seleccione Lugar --</option>
-                            <option value="Seguridad Interno">Seguridad Interno</option>
-                            <option value="Oficina de seguridad">Oficina de seguridad</option>
-                            <option value="Entregada a otro personal">Entregada a otro personal</option>
-                            </select>
-                    </div>
-
-                    <div>
-                        <label for="returnObservation" class="block text-sm font-medium text-gray-700">Observación de Devolución (Opcional)</label>
-                        <textarea id="returnObservation" name="returnObservation" rows="2" class="mt-1 block w-full border border-gray-300 rounded-xl shadow-sm p-3 focus:ring-green-500 focus:border-green-500"></textarea>
-                    </div>
-
-                    <div class="flex justify-end space-x-3 pt-2">
-                        <button type="button" onclick="closeReturnModal()" class="px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-xl hover:bg-gray-300 transition-colors duration-200">Cancelar</button>
-                        <button type="submit" id="confirm-return-btn" class="btn-success">
-                            <span id="return-submit-text">Confirmar Devolución</span>
-                            <span id="return-submit-loading" class="hidden flex items-center justify-center">
-                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                Procesando...
-                            </span>
-                        </button>
-                    </div>
-                </form>
-            </div>
+        <div class="controls-container">
+            <div class="chips" id="chips"></div>
         </div>
 
+        <div class="actions">
+            <button id="btnExport" class="action-btn success"><i class="fas fa-file-pdf"></i> Generar PDF</button>
+            <button id="btnClear" class="action-btn danger"><i class="fas fa-eraser"></i> Borrar Horarios</button>
+        </div>
+
+        <div class="table-container" id="temperaturas-table-container">
+            <table id="temperaturas-tabla" class="main-table">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">TEMP</th>
+                        <th style="width: 30%;" class="left product-sensitive">NEVERAS</th>
+                        <th style="width: 15%;">22:00</th>
+                        <th style="width: 15%;">00:00</th>
+                        <th style="width: 15%;">02:00</th>
+                        <th style="width: 15%;">04:00</th>
+                    </tr>
+                </thead>
+                <tbody id="temperaturas-tbody"></tbody>
+            </table>
+        </div>
+
+        <div class="table-container" id="revisiones-table-container" style="display: none;">
+            <table id="revisiones-tabla" class="main-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">PUERTAS Y/O ÁREAS</th>
+                        <th style="width: 10%;">REVISIÓN Nº1</th>
+                        <th style="width: 15%;">OBSERVACIÓN</th>
+                        <th style="width: 10%;">REVISIÓN Nº2</th>
+                        <th style="width: 15%;">OBSERVACIÓN</th>
+                        <th style="width: 10%;">REVISIÓN Nº3</th>
+                        <th style="width: 15%;">OBSERVACIÓN</th>
+                    </tr>
+                </thead>
+                <tbody id="revisiones-tbody"></tbody>
+            </table>
+        </div>
+        
+        <div class="table-container" id="contenedor-table-container" style="display: none;">
+            <table id="contenedor-tabla" class="container-temp-table">
+                <thead>
+                    <tr>
+                        <th>N° DE CONT.</th>
+                        <th>TEMP OBJETIVO</th>
+                        <th>FECHA REVISIÓN</th> 
+                        <th>HORA REVISIÓN</th>
+                        <th>TEMP. REG.</th>
+                        <th>SEGURIDAD</th>
+                    </tr>
+                </thead>
+                <tbody id="contenedor-tbody"></tbody>
+            </table>
+            <div class="observaciones" style="padding: 15px 0;">
+                <h3>Observación:</h3>
+                <p>1- Cuando el contenedor mantiene la luz **roja** donde dice **DEFROST** es porque se mantiene en descongelamiento y la temperatura debe llegar a **-16°** y luego ir bajando.</p>
+                <p>2- El personal cuando proceda a introducir o a retirar mercancía del contenedor deberá **apagarlo** y cuando terminen de introducir o retirar mercancía nuevamente **encenderlo**.</p>
+            </div>
+        </div>
+        </div>
+
+    <div id="toast-container"></div>
+
+    <div id="clearModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <i class="fas fa-eraser modal-icon"></i>
+            <h2>¿Borrar Horarios?</h2>
+            <p>Esta acción eliminará todos los datos de la sección activa.</p>
+            <div class="modal-actions">
+                <button id="clearModalConfirmBtn" class="action-btn danger">Confirmar</button>
+                <button id="clearModalCancelBtn" class="action-btn">Cancelar</button>
+            </div>
+        </div>
     </div>
 
+    <div id="termsModal" class="modal">
+        <div class="modal-content large-text">
+            <span class="close-btn">&times;</span>
+            <h2>Términos y Condiciones</h2>
+            <p>
+                Este sistema de revisión y control de temperatura es una herramienta de uso interno y exclusivo para el personal de seguridad, específicamente para la sucursal R/S Chitré Selecto.
+            </p>
+            <p>
+                Al utilizar esta aplicación, usted acepta los siguientes términos:
+            </p>
+            <ul>
+                <li>Los datos registrados, incluyendo temperaturas y observaciones, son propiedad de R/S Chitré Selecto y deben ser tratados con confidencialidad.</li>
+                <li>La información debe ser veraz y precisa. Cualquier registro falso o inexacto será responsabilidad del usuario que lo ingrese.</li>
+                <li>La aplicación está diseñada para facilitar el proceso de control y seguimiento. No reemplaza los procedimientos de seguridad y revisión establecidos por la empresa.</li>
+                <li>El uso de esta herramienta está restringido a las funciones laborales asignadas.</li>
+            </ul>
+            <p>
+                Rafael Ramos. Se reserva el derecho de modificar, actualizar o suspender la aplicación en cualquier momento, con o sin previo aviso. El uso continuado de la aplicación implica la aceptación de cualquier modificación a estos términos.
+            </p>
+        </div>
+    </div>
+
+    <div id="privacyModal" class="modal">
+        <div class="modal-content large-text">
+            <span class="close-btn">&times;</span>
+            <h2>Política de Privacidad</h2>
+            <p>
+                Esta Política de Privacidad describe cómo se recopila, utiliza y protege la información en la aplicación "Revisión y Temperatura" para la sucursal R/S Chitré Selecto.
+            </p>
+            <p>
+                <strong>Información Recopilada:</strong> La aplicación registra temperaturas, estados de revisión y notas. Esta información es de uso exclusivo para la gestión interna de la empresa y no incluye datos personales sensibles.
+            </p>
+            <p>
+                <strong>Uso de la Información:</strong> La información recopilada se utiliza únicamente para el monitoreo, control de seguridad y seguimiento interno. No se comparte, vende ni distribuye a terceros externos a la organización.
+            </p>
+            <p>
+                <strong>Protección de Datos:</strong> Se toman medidas de seguridad para proteger los datos contra el acceso no autorizado. Los datos se almacenan de forma local en el dispositivo del usuario para garantizar la confidencialidad.
+            </p>
+            <p>
+                <strong>Cambios en la Política:</strong> Nos reservamos el derecho de modificar esta Política de Privacidad. Se notificará a los usuarios sobre cualquier cambio a esta Política a través de la propia aplicación.
+            </p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>
+            © 2025 Rafael Ramos. Todos los derechos reservados.
+            <a href="#" id="openTermsModal">Términos y Condiciones</a>
+            <span class="divider">|</span>
+            <a href="#" id="openPrivacyModal">Política de Privacidad</a>
+        </p>
+    </footer>
+
+    <button id="btnDefrost" class="floating-btn" style="display: none;">DEF</button>
+    
+    <button id="btnLavado" class="floating-btn" style="display: none;">LAV</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
     <script>
-        const STORAGE_KEY = 'keyControlLogs';
-        const SESSION_KEY = 'currentSecurityId';
-
-        // --- Nombres de Guardia de Seguridad y sus credenciales ---
-        const VALID_USERS = {
-            'Rafael Ramos': { password: '1234', id: 'RR 19075' },
-            'José Guevara': { password: '1234', id: 'JG 5604' },
-            'Ariel Bernal': { password: '1234', id: 'AB 22750' },
-            'Oriel Aizprua': { password: '1234', id: 'OA 17411' },
-            'Leandro Pérez': { password: '1234', id: 'LP 26511' },
-            'Samuel Reyes': { password: '1234', id: 'SR 26113' }
-        };
-
-        let securityId = null; 
-        let signaturePadCheckout; 
-
-        // --- 1. AUTHENTICATION FUNCTIONS ---
-
-        function updateUIForLogin(id) {
-            securityId = id;
-            document.getElementById('security-id').textContent = id;
-            document.getElementById('main-app-content').classList.remove('hidden');
-            document.getElementById('login-modal').classList.add('hidden');
-            renderKeyList(); 
-        }
-
-        function handleLogin(e) {
-            e.preventDefault();
-
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const errorDiv = document.getElementById('login-error');
-
-            if (VALID_USERS[username] && VALID_USERS[username].password === password) {
-                sessionStorage.setItem(SESSION_KEY, VALID_USERS[username].id);
-                updateUIForLogin(VALID_USERS[username].id);
-                errorDiv.classList.add('hidden');
-                showMessage(`Bienvenido, ${username}! (ID: ${VALID_USERS[username].id})`, 'success');
-            } else {
-                errorDiv.classList.remove('hidden');
-            }
-        }
-
-        window.handleLogout = function() {
-            sessionStorage.removeItem(SESSION_KEY);
-            securityId = null;
-            document.getElementById('main-app-content').classList.add('hidden');
-            document.getElementById('login-modal').classList.remove('hidden');
-            showMessage("Sesión cerrada correctamente.", 'info');
-        }
-
-        function checkLoginStatus() {
-            const storedId = sessionStorage.getItem(SESSION_KEY);
-            if (storedId && Object.values(VALID_USERS).some(user => user.id === storedId)) {
-                updateUIForLogin(storedId);
-            } else {
-                document.getElementById('login-modal').classList.remove('hidden');
-                document.getElementById('main-app-content').classList.add('hidden');
-            }
-        }
-
-
-        // --- 2. UTILITY FUNCTIONS ---
-
-        function generateUUID() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registrado con éxito:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Fallo en el registro de Service Worker:', error);
+                    });
             });
         }
 
-        function loadLogs() {
-            try {
-                const json = localStorage.getItem(STORAGE_KEY);
-                return json ? JSON.parse(json) : [];
-            } catch (error) {
-                console.error("Error al cargar logs de localStorage:", error);
-                return [];
-            }
-        }
+        (function () {
+            // Se cambia el nombre de la sección de contenedores a CONTENEDOR
+            const DEFAULT_SECCIONES = ['TEMPERATURAS', 'REVISIONES', 'CONTENEDOR'];
+            const STORAGE_KEY_TEMPERATURAS = 'data_temperaturas';
+            const STORAGE_KEY_REVISIONES = 'data_revisiones';
+            const STORAGE_KEY_CONTENEDOR = 'data_contenedor'; // Clave de almacenamiento cambiada
+            const STORAGE_KEY_VESPERTINO = 'vespertino_nombre'; 
+            const STORAGE_KEY_NOCTURNO = 'nocturno_nombre'; 
 
-        function saveLogs(logs) {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
-            } catch (error) {
-                console.error("Error al guardar logs en localStorage:", error);
-                showMessage("Error al guardar datos. El almacenamiento local está lleno.", 'error');
-            }
-        }
+            let dataTemperaturas = JSON.parse(localStorage.getItem(STORAGE_KEY_TEMPERATURAS));
+            let dataRevisiones = JSON.parse(localStorage.getItem(STORAGE_KEY_REVISIONES));
+            let dataContenedor = JSON.parse(localStorage.getItem(STORAGE_KEY_CONTENEDOR)); // Variable de datos cambiada
+            let activeInput = null; // Variable para rastrear el campo de entrada activo
 
-        function formatTimestamp(timestamp) {
-            if (!timestamp) return 'N/A';
-            const date = new Date(timestamp);
-            const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
-            const timeOptions = { hour: '2-digit', minute: '2-digit' };
+            const reviewDateInput = document.getElementById('review-date');
+            const vespertinoNombreInput = document.getElementById('vespertino-nombre'); 
+            const nocturnoNombreInput = document.getElementById('nocturno-nombre'); 
+            const btnDefrost = document.getElementById('btnDefrost'); 
+            const btnLavado = document.getElementById('btnLavado'); // NUEVO BOTÓN LAVADO
 
-            return `${date.toLocaleDateString('es-ES', dateOptions)} ${date.toLocaleTimeString('es-ES', timeOptions)}`;
-        }
-
-        function formatTimeForPdf(timestamp) {
-            if (!timestamp) return 'N/A';
-            const date = new Date(timestamp);
-            return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
-        }
-
-        function showMessage(message, type = 'info') {
-            const container = document.getElementById('message-container');
-            let bgColor = 'bg-blue-100 border-blue-400 text-blue-700';
-            let icon = 'ℹ️';
-            if (type === 'error') { bgColor = 'bg-red-100 border-red-400 text-red-700'; icon = '❌'; }
-            if (type === 'success') { bgColor = 'bg-green-100 border-green-400 text-green-700'; icon = '✅'; }
-
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `p-4 rounded-xl shadow-lg border ${bgColor} mb-4 flex items-center space-x-3 transition-opacity duration-300`;
-            msgDiv.innerHTML = `<span class="text-2xl">${icon}</span><p class="font-medium">${message}</p>`;
-
-            container.innerHTML = '';
-            container.appendChild(msgDiv);
-
-            setTimeout(() => {
-                msgDiv.classList.add('opacity-0');
-                msgDiv.addEventListener('transitionend', () => msgDiv.remove());
-            }, 5000);
-        }
-
-        function getStartOfToday() {
-            const now = new Date();
-            now.setHours(0, 0, 0, 0);
-            return now.getTime();
-        }
-
-        // --- 3. INITIALIZATION AND UI SETUP ---
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
-            document.getElementById('return-form').addEventListener('submit', handleReturn);
-            document.getElementById('login-form').addEventListener('submit', handleLogin);
-
-            const canvasCheckout = document.getElementById('signature-pad-checkout');
-            if (canvasCheckout) {
-                
-                // Función de redimensionamiento mejorada y forzada
-                function resizeCanvas() {
-                    const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                    canvasCheckout.width = canvasCheckout.offsetWidth * ratio; 
-                    canvasCheckout.height = canvasCheckout.offsetHeight * ratio;
-                    canvasCheckout.getContext("2d").scale(ratio, ratio);
+            const initialTemperaturesData = [
+                { temp: '-20°', nevera: 'NEVERA DE HIELOS' }, { temp: '-23°', nevera: 'HELADERIA 1' },
+                { temp: '-21°', nevera: 'HELADERIA 2' }, { temp: '-20°', nevera: 'CONGELADOR HELADERIA 1' },
+                { temp: '5°', nevera: 'NEVERA HELADERIA 1' }, { temp: '-20°', nevera: 'CONGELADOR HELADERIA 2' },
+                { temp: '5°', nevera: 'NEVERA HELADERIA 2' }, { temp: '5°', nevera: 'NEVERA DE SODAS' },
+                { temp: '-22°', nevera: 'HELADOS 1' }, { temp: '-22°', nevera: 'HELADOS 2' },
+                { temp: '-24°', nevera: 'HELADOS IMPORTADOS' }, { temp: '-25°', nevera: 'NEVERA PAPAS FRITAS' },
+                { temp: '-21°', nevera: 'PANES CONGELADOS' }, { temp: '-25°', nevera: 'MARISCOS CONGELADOS' },
+                { temp: '-21°', nevera: 'TORTILLAS CONGELADAS 1' }, { temp: '-25°', nevera: 'TORTILLAS CONGELADAS 2' },
+                { temp: '5°', nevera: 'NEVERA PANADERIA' }, { temp: '-20°', nevera: 'CONGELADOR PANADERIA' },
+                { temp: '3°', nevera: 'NEVERA CERVEZAS' }, { temp: '3°', nevera: 'NEVERA PRODUCTOS RIMITH' },
+                { temp: '4°', nevera: 'NEVERA LACTEOS RIMITH' }, { temp: '4°', nevera: 'NEVERA EMBUTIDOS RIMITH' },
+                { temp: '2°', nevera: 'NEVERA QUESOS RIMITH' }, { temp: '4°', nevera: 'NEVERAS CARNES EMPACADAS' },
+                { temp: '6°', nevera: 'NEVERA HUEVOS' }, { temp: '4°', nevera: 'NEVERA EMBUTIDOS' },
+                { temp: '5°', nevera: 'NEVERA AREPAS' }, { temp: '4°', nevera: 'NEVERA FRUTAS' },
+                { temp: '5°', nevera: 'NEVERA FRUTAS ENVASADAS' }, { temp: '3°', nevera: 'TORTILLAS RIMITH' },
+                { temp: '2°', nevera: 'NEVERA YOGURT' }, { temp: '4°', nevera: 'NEVERA JUGOS' },
+                { temp: '5°', nevera: 'NEVERA MANZANAS' }, { temp: '5°', nevera: 'NEVERA LEGUMBRES' },
+                { temp: '4°', nevera: 'NEVERA FLORES' }, { temp: '3°', nevera: 'NEVERAS POLLO (CARNICERIA)' },
+                { temp: '3°', nevera: 'NEVERAS CARNES (CARNICERIA)' }, { temp: '3°', nevera: 'NEVERA EMBUTIDOS (CARNICERIA)' },
+                { temp: '4°', nevera: 'CUARTO FRIO MEZANINE' }, { temp: '4°', nevera: 'CUARTO FRIO RECIBO' },
+                { temp: '-20°', nevera: 'CONGELADOR RECIBO' },
+            ];
+            const initialRevisionesData = [
+                { area: 'PUERTA DE LADO DEL HOTEL' }, { area: 'PUERTA DE SALIDA PRINCIPAL' },
+                { area: 'PUERTA DE VIVERO' }, { area: 'PUERTA DE RECIBO' },
+                { area: 'PUERTA DE SANIDAD' }, { area: 'PUERTA DEL COMEDOR' },
+                { area: 'PUERTA DE DECORACIÓN' }, { area: 'PUERTA DE BACK OFFICE' },
+                { area: 'PUERTA OFICINA LIC MELISSA' }, { area: 'PUERTA DE SERVIDORES' },
+                { area: 'PUERTA DE SEGURIDAD' }, { area: 'PUERTA DE BÓVEDA' },
+            ];
+            
+            // Datos para la tabla de Contenedor (modificados: eliminada fecha_inicial)
+            const initialContenedorData = [
+                {
+                    cont_num: 'EGHU 500081-3', 
+                    cont_temp_target: '(-24°)',
+                    rows: [
+                        { hora: '06:00', fecha_rev: '', temp_reg: '', seguridad: '' }, 
+                        { hora: '10:00', fecha_rev: '', temp_reg: '', seguridad: '' }, 
+                        { hora: '14:00', fecha_rev: '', temp_reg: '', seguridad: '' }, 
+                        { hora: '18:00', fecha_rev: '', temp_reg: '', seguridad: '' }, 
+                        { hora: '22:00', fecha_rev: '', temp_reg: '', seguridad: '' }, 
+                        { hora: '02:00', fecha_rev: '', temp_reg: '', seguridad: '' }, 
+                    ]
                 }
-
-                // Forzar la primera ejecución para que tenga altura ANTES de SignaturePad
-                resizeCanvas(); 
-                setTimeout(resizeCanvas, 100); 
-
-                window.addEventListener('resize', resizeCanvas);
-
-                signaturePadCheckout = new SignaturePad(canvasCheckout, {
-                    backgroundColor: 'rgb(255, 255, 255)' 
-                });
-
-                document.getElementById('clear-signature-checkout').addEventListener('click', () => {
-                    signaturePadCheckout.clear();
-                });
-            }
-
-            checkLoginStatus();
-            document.getElementById('key-list-loading').classList.add('hidden');
-        });
-
-
-        // --- 4. REGISTRAR ENTREGA DE LLAVE (CHECKOUT) CON FIRMA ---
-        async function handleCheckout(e) {
-            e.preventDefault();
-
-            if (!securityId) {
-                showMessage("Debe iniciar sesión para registrar una entrega.", 'error');
-                return;
-            }
-
-            if (signaturePadCheckout && signaturePadCheckout.isEmpty()) {
-                showMessage("Por favor, el solicitante debe firmar en el recuadro antes de registrar la entrega.", 'error');
-                return;
-            }
-
-            const submitText = document.getElementById('submit-text');
-            const submitLoading = document.getElementById('submit-loading');
-            const checkoutSubmitBtn = document.getElementById('checkout-submit-btn');
-
-            checkoutSubmitBtn.disabled = true;
-            submitText.classList.add('hidden');
-            submitLoading.classList.remove('hidden');
-
-            const formData = new FormData(e.target);
-            
-            // Generar la Data URL de la firma con formato JPEG (menor tamaño)
-            // *** CORRECCIÓN CLAVE 1: Forzar una resolución para la Data URL ***
-            const canvas = signaturePadCheckout.canvas;
-            const originalRatio = canvas.width / canvas.height;
-            // Definir un ancho de destino en píxeles
-            const targetWidth = 400; 
-            const targetHeight = targetWidth / originalRatio; 
-
-            // Exportar la firma forzando el escalado interno
-            const signatureDataURL = signaturePadCheckout ? 
-                signaturePadCheckout.toDataURL('image/jpeg', 0.8) : // Usamos la función básica de toDataURL ya que la versión con dimensiones puede ser incompatible
-                null;
-            
-            // OPTIMIZACIÓN (Si la firma es grande y ocupa mucho espacio en local storage)
-            // Si la librería soporta el escalado, se usaría:
-            // signaturePadCheckout.toDataURL('image/jpeg', 0.8, targetWidth, targetHeight);
-            // Por ahora, usamos la versión estándar y confiamos en el ajuste de jsPDF
-
-            const newLog = {
-                id: generateUUID(), 
-                userName: formData.get('userName').trim(), 
-                keyRequested: formData.get('keyRequested').trim(), 
-                checkoutLocation: formData.get('checkoutLocation'), 
-                checkoutObservation: formData.get('checkoutObservation').trim() || 'N/A',
-                isReturned: false, 
-
-                checkoutTime: Date.now(), 
-                checkoutUserId: securityId, 
-                
-                // GUARDAR FIRMA COMO Base64
-                checkoutSignature: signatureDataURL, 
-            };
-
-            const logs = loadLogs();
-            logs.push(newLog);
-            saveLogs(logs);
-            renderKeyList();
-
-            showMessage("Entrega de llave registrada con éxito.", 'success');
-            e.target.reset(); 
-            if (signaturePadCheckout) signaturePadCheckout.clear(); 
-
-            checkoutSubmitBtn.disabled = false;
-            submitText.classList.remove('hidden');
-            submitLoading.classList.add('hidden');
-        }
-
-
-        // --- 5. RENDERIZAR LISTA DE LLAVES PENDIENTES ---
-        function renderKeyList() {
-            const logs = loadLogs();
-            const pendingKeys = logs.filter(log => !log.isReturned);
-
-            pendingKeys.sort((a, b) => a.checkoutTime - b.checkoutTime);
-
-            const pendingKeysList = document.getElementById('pending-keys-list');
-            const keyListEmpty = document.getElementById('key-list-empty');
-
-            pendingKeysList.innerHTML = ''; 
-
-            if (pendingKeys.length === 0) {
-                keyListEmpty.classList.remove('hidden');
-                return;
-            }
-
-            keyListEmpty.classList.add('hidden');
-
-            pendingKeys.forEach(key => {
-                const checkoutTimeFormatted = formatTimestamp(key.checkoutTime);
-
-                const keyCard = document.createElement('div');
-                keyCard.className = 'card bg-yellow-50 border-yellow-300 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 p-4';
-                keyCard.innerHTML = `
-                    <div class="flex-1 w-full">
-                        <p class="text-xl font-extrabold text-indigo-800">${key.keyRequested}</p>
-                        <p class="text-sm text-gray-700 mb-1">
-                            <span class="font-bold">Solicita:</span> ${key.userName} 
-                            <span class="text-xs text-gray-500 ml-2">(${key.checkoutLocation})</span>
-                        </p>
-                        <p class="text-xs text-gray-500 mt-1">
-                            <span class="font-bold text-indigo-500">ENTREGA:</span> ${checkoutTimeFormatted} 
-                            <span class="text-gray-400">por ${key.checkoutUserId}</span>
-                        </p>
-                        <p class="text-xs text-gray-500 italic mt-0.5">Obs: ${key.checkoutObservation}</p>
-                    </div>
-                    <button data-id="${key.id}" data-key="${key.keyRequested}" data-user="${key.userName}" 
-                            class="btn-success w-full sm:w-auto log-return-btn text-sm">
-                        RETORNA
-                    </button>
-                `;
-                pendingKeysList.appendChild(keyCard);
-            });
-
-            document.querySelectorAll('.log-return-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const docId = e.currentTarget.getAttribute('data-id');
-                    const keyName = e.currentTarget.getAttribute('data-key');
-                    const userName = e.currentTarget.getAttribute('data-user');
-                    openReturnModal(docId, keyName, userName);
-                });
-            });
-        }
-
-        // --- 6. GESTIÓN DEL MODAL Y DEVOLUCIÓN ---
-        const returnModal = document.getElementById('return-modal');
-        const modalKeyName = document.getElementById('modal-key-name');
-        const modalUserName = document.getElementById('modal-user-name');
-        let currentEditingDocId = null;
-
-        window.openReturnModal = (docId, keyName, userName) => {
-            currentEditingDocId = docId;
-            modalKeyName.textContent = keyName;
-            modalUserName.textContent = userName;
-            returnModal.classList.remove('hidden');
-            returnModal.classList.add('flex');
-
-            document.getElementById('return-form').reset();
-            document.getElementById('returnLocation').focus();
-        }
-
-        window.closeReturnModal = () => {
-            currentEditingDocId = null;
-            returnModal.classList.add('hidden');
-            returnModal.classList.remove('flex');
-        }
-
-        // --- 7. REGISTRAR DEVOLUCIÓN DE LLAVE (RETURN) ---
-        async function handleReturn(e) {
-            e.preventDefault();
-
-            if (!securityId) {
-                showMessage("Debe iniciar sesión para registrar una devolución.", 'error');
-                closeReturnModal();
-                return;
-            }
-
-            if (!currentEditingDocId) {
-                showMessage("Error: ID de registro no encontrado.", 'error');
-                closeReturnModal();
-                return;
-            }
-
-            const returnSubmitText = document.getElementById('return-submit-text');
-            const returnSubmitLoading = document.getElementById('return-submit-loading');
-            const confirmReturnBtn = document.getElementById('confirm-return-btn');
-
-            confirmReturnBtn.disabled = true;
-            returnSubmitText.classList.add('hidden');
-            returnSubmitLoading.classList.remove('hidden');
-
-            const formData = new FormData(e.target);
-            const returnData = {
-                isReturned: true,
-                returnTime: Date.now(), 
-                returnLocation: formData.get('returnLocation'), 
-                returnObservation: formData.get('returnObservation').trim() || 'N/A',
-                returnUserId: securityId, 
-            };
-
-            const logs = loadLogs();
-            const logIndex = logs.findIndex(log => log.id === currentEditingDocId);
-
-            if (logIndex !== -1) {
-                logs[logIndex] = { ...logs[logIndex], ...returnData };
-                saveLogs(logs);
-                renderKeyList();
-
-                showMessage("Devolución de llave registrada con éxito.", 'success');
-            } else {
-                showMessage("Error: El registro a devolver no fue encontrado.", 'error');
-            }
-
-            closeReturnModal();
-            confirmReturnBtn.disabled = false;
-            returnSubmitText.classList.remove('hidden');
-            returnSubmitLoading.classList.add('hidden');
-        }
-
-
-        // ******************************************************************
-        // ************ FUNCIÓN DE EXPORTACIÓN CON jsPDF.autoTable() *********
-        // ******************************************************************
-
-        function addReportHeaderAndFooter(doc, pageWidth, margin) {
-            const pageHeight = doc.internal.pageSize.height;
-            let yPos = 15;
-
-            // TÍTULOS
-            doc.setFontSize(16).setFont('helvetica', 'bold');
-            doc.setTextColor(44, 62, 80); 
-            doc.text("GRUPO RIBA SMITH", pageWidth / 2, yPos, { align: 'center' });
-            yPos += 6;
-            doc.setFontSize(12).setFont('helvetica', 'normal');
-            doc.text("R/S CHITRÉ SELECTO", pageWidth / 2, yPos, { align: 'center' });
-            yPos += 5;
-
-            doc.setFontSize(14).setFont('helvetica', 'bold');
-            doc.setTextColor(52, 152, 219); 
-            doc.text("REPORTE DIARIO DE CONTROL DE LLAVES", pageWidth / 2, yPos, { align: 'center' });
-            yPos += 8;
-
-            // INFORMACIÓN DE FECHA Y USUARIO
-            const todayDate = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            doc.setFontSize(10).setFont('helvetica', 'normal');
-            doc.setTextColor(75, 85, 99); 
-            doc.text(`Fecha del Reporte: ${todayDate}`, margin, yPos);
-            doc.text(`Generado por ID de Seguridad: ${securityId}`, pageWidth - margin, yPos, { align: 'right' });
-            yPos += 5;
-
-            // PIE DE PÁGINA
-            doc.setFontSize(8).setFont('helvetica', 'normal');
-            doc.setTextColor(107, 114, 128); 
-            const footerText = 'Powered by Rafael Ramos | Página ' + doc.internal.getNumberOfPages();
-            doc.text(footerText, pageWidth / 2, pageHeight - 5, { align: 'center' });
-
-            return yPos + 3; 
-        }
-
-        window.generateDailyReportPdf = function() {
-            if (!securityId) {
-                showMessage("Debe iniciar sesión para generar el reporte.", 'error');
-                return;
-            }
-
-            let jsPDF_Constructor;
-
-            if (typeof jsPDF !== 'undefined') {
-                jsPDF_Constructor = jsPDF;
-            } 
-            else if (window.jspdf && window.jspdf.jsPDF) {
-                jsPDF_Constructor = window.jspdf.jsPDF;
-            } 
-            else {
-                showMessage("❌ ERROR: La librería jsPDF y/o el plugin autotable no están cargados correctamente. Verifique la conexión a internet.", 'error');
-                return;
-            }
-
-            // Inicializar jsPDF
-            const doc = new jsPDF_Constructor('p', 'mm', 'a4'); 
-
-            if (typeof doc.autoTable !== 'function') {
-                showMessage("❌ ERROR: El plugin jsPDF AutoTable no se cargó.", 'error');
-                return;
-            }
-
-
-            const logs = loadLogs();
-            const startOfToday = getStartOfToday();
-            const todayLogs = logs.filter(log => log.checkoutTime >= startOfToday)
-                                  .sort((a, b) => a.checkoutTime - b.checkoutTime);
-
-            if (todayLogs.length === 0) {
-                showMessage("No hay registros de entrega para el día de hoy para generar el reporte.", 'info');
-                return;
-            }
-
-            const margin = 10;
-            const pageWidth = doc.internal.pageSize.getWidth();
-
-            // Re-añadir el encabezado para la primera página
-            let currentY = addReportHeaderAndFooter(doc, pageWidth, margin); 
-
-            const headers = [
-                "Activo", 
-                "Usuario", 
-                "Depto (ENT)", 
-                "ID Ent",
-                "Hora Ent",
-                "Firma (ENT)", // Índice 5
-                "Estado",
-                "ID Ret",
-                "Hora Ret",
-                "Obs. (ENTREGA)",
-                "Obs. (RETORNA)"
             ];
 
-            const body = todayLogs.map(log => {
-                const hourEnt = formatTimeForPdf(log.checkoutTime);
-                const hourRet = log.isReturned ? formatTimeForPdf(log.returnTime) : 'N/A';
-                const status = log.isReturned ? 'DEVUELTO' : 'PENDIENTE';
+            // Inicialización de datos
+            if (!dataTemperaturas || dataTemperaturas.length === 0 || !dataTemperaturas[0].nevera) {
+                dataTemperaturas = initialTemperaturesData.map(item => ({ ...item, t2200: '', t0000: '', t0200: '', t0400: '' }));
+            }
+            if (!dataRevisiones || dataRevisiones.length === 0 || !dataRevisiones[0].area) {
+                dataRevisiones = initialRevisionesData.map(item => ({ ...item, rev1: '', obs1: '', rev2: '', obs2: '', rev3: '', obs3: '' }));
+            }
+            // Inicializa la data del contenedor si no existe
+            if (!dataContenedor || dataContenedor.length === 0 || !dataContenedor[0].cont_num) {
+                 // Usa una copia profunda para asegurar que los cambios se reflejen solo en el almacenamiento
+                dataContenedor = JSON.parse(JSON.stringify(initialContenedorData));
+            }
 
-                let signatureImage = null;
-                if (log.checkoutSignature && log.checkoutSignature.length > 500) { 
-                    signatureImage = log.checkoutSignature;
+
+            let seccionActiva = DEFAULT_SECCIONES[0];
+            const chipsEl = document.getElementById('chips');
+            const btnExport = document.getElementById('btnExport');
+            const btnClear = document.getElementById('btnClear');
+            const mainTitle = document.getElementById('main-title');
+            const temperaturasTableContainer = document.getElementById('temperaturas-table-container');
+            const revisionesTableContainer = document.getElementById('revisiones-table-container');
+            const contenedorTableContainer = document.getElementById('contenedor-table-container'); // Contenedor cambiado
+            const clearModal = document.getElementById('clearModal');
+            const termsModal = document.getElementById('termsModal');
+            const privacyModal = document.getElementById('privacyModal');
+            const clearModalConfirmBtn = document.getElementById('clearModalConfirmBtn');
+            const clearModalCancelBtn = document.getElementById('clearModalCancelBtn');
+            const openTermsModalBtn = document.getElementById('openTermsModal');
+            const openPrivacyModalBtn = document.getElementById('openPrivacyModal');
+            const allCloseBtns = document.querySelectorAll('.close-btn');
+
+            let saveTimer = null;
+            function saveAndNotify() {
+                clearTimeout(saveTimer);
+                saveTimer = setTimeout(() => {
+                    localStorage.setItem(STORAGE_KEY_TEMPERATURAS, JSON.stringify(dataTemperaturas));
+                    localStorage.setItem(STORAGE_KEY_REVISIONES, JSON.stringify(dataRevisiones));
+                    localStorage.setItem(STORAGE_KEY_CONTENEDOR, JSON.stringify(dataContenedor)); // Guarda data del contenedor
+                    localStorage.setItem(STORAGE_KEY_VESPERTINO, vespertinoNombreInput.value);
+                    localStorage.setItem(STORAGE_KEY_NOCTURNO, nocturnoNombreInput.value);
+                }, 300);
+            }
+
+            let currentToastElement = null;
+
+            function showToast(message, iconClass, duration = 3000) {
+                const toastContainer = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.innerHTML = `<i class="${iconClass}"></i> ${message}`;
+                toastContainer.prepend(toast); 
+                setTimeout(() => { toast.classList.add('show'); }, 10); 
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => { toast.remove(); }, 300); 
+                }, duration);
+            }
+
+            function showLoadingToast(message) {
+                if (currentToastElement) hideToast(currentToastElement); 
+                const toastContainer = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'toast loading-toast';
+                toast.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${message}`;
+                toastContainer.prepend(toast);
+                currentToastElement = toast;
+                setTimeout(() => { toast.classList.add('show'); }, 10); 
+                return toast;
+            }
+
+            function hideToast(toastElement) {
+                if (toastElement) {
+                    toastElement.classList.remove('show');
+                    setTimeout(() => { 
+                        toastElement.remove(); 
+                        if (toastElement === currentToastElement) {
+                            currentToastElement = null;
+                        }
+                    }, 300);
                 }
+            }
 
-                return [
-                    log.keyRequested || 'N/A',
-                    log.userName || 'N/A',
-                    log.checkoutLocation || 'N/A',
-                    log.checkoutUserId || 'N/A', 
-                    hourEnt,
-                    // Si hay firma, se inserta la Data URL. Si no, se deja 'N/A'
-                    signatureImage || 'N/A', 
-                    status,
-                    log.returnUserId || 'N/A', 
-                    hourRet,
-                    log.checkoutObservation || 'N/A',
-                    log.returnObservation || 'N/A'
-                ];
-            });
+            function validateTemperature(value) {
+                const num = parseFloat(value);
+                return !isNaN(num) && num >= -30 && num <= 10;
+            }
+            
+            /**
+             * Convierte un objeto Date a un string DD/MM/YYYY.
+             * @param {Date} dateObj
+             * @returns {string} Fecha en formato DD/MM/YYYY
+             */
+            function formatDateToDmy(dateObj) {
+                if (!(dateObj instanceof Date) || isNaN(dateObj)) return '';
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const year = dateObj.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
 
-            // 3. GENERACIÓN DE LA TABLA CON ESTILO
-            doc.autoTable({
-                startY: currentY,
-                head: [headers],
-                body: body,
-                theme: 'striped', 
-                headStyles: { 
-                    fillColor: [44, 62, 80], 
-                    textColor: 255, 
-                    fontStyle: 'bold',
-                    fontSize: 7, 
-                    halign: 'center' 
-                },
-                styles: {
-                    fontSize: 6, 
-                    cellPadding: 1, 
-                    overflow: 'linebreak' 
-                },
-                columnStyles: {
-                    0: { cellWidth: 12, halign: 'center' }, // Activo
-                    1: { cellWidth: 16 }, // Usuario
-                    2: { cellWidth: 14 }, // Depto (ENT)
-                    3: { cellWidth: 8, halign: 'center' }, // ID Ent
-                    4: { cellWidth: 8, halign: 'center' }, // Hora Ent
-                    5: { cellWidth: 18, halign: 'center', minCellHeight: 18, valign: 'middle' }, // FIRMA (Ajustado para la imagen)
-                    6: { cellWidth: 13, fontStyle: 'bold', halign: 'center' }, // Estado 
-                    7: { cellWidth: 8, halign: 'center' }, // ID Ret
-                    8: { cellWidth: 8, halign: 'center' }, // Hora Ret
-                    9: { cellWidth: 32 }, // Obs. (ENTREGA)
-                    10: { cellWidth: 32 }  // Obs. (RETORNA)
-                },
-                margin: { left: margin, right: margin },
+            /**
+             * Convierte un string yyyy-mm-dd (del input type="date") a DD/MM/YYYY.
+             * @param {string} yyyymmdd
+             * @returns {string} Fecha en formato DD/MM/YYYY
+             */
+            function formatYyyyMmDdToDmy(yyyymmdd) {
+                if (!yyyymmdd || typeof yyyymmdd !== 'string' || !yyyymmdd.match(/^\d{4}-\d{2}-\d{2}$/)) return '';
+                const parts = yyyymmdd.split('-');
+                if (parts.length === 3) {
+                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                }
+                return yyyymmdd;
+            }
 
-                didDrawPage: (data) => {
-                    addReportHeaderAndFooter(doc, pageWidth, margin);
-                },
+            // Función para obtener la fecha de hoy en formato yyyy-mm-dd para inputs
+            function getTodayDateFormattedForInput() {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
 
-                // CORRECCIÓN CLAVE: AJUSTE DE DIMENSIONES PARA EVITAR LA BARRA NEGRA
-                didDrawCell: (data) => {
-                    // Columna de Firma (Índice 5) y solo en el cuerpo de la tabla
-                    if (data.column.index === 5 && data.cell.section === 'body') {
-                        const firmaDataURL = data.cell.raw; 
-                        
-                        // 2. DIBUJAR LA FIRMA
-                        if (firmaDataURL && typeof firmaDataURL === 'string' && firmaDataURL.startsWith('data:image/jpeg')) {
-                            const cellWidth = data.cell.width;
-                            const cellHeight = data.cell.height;
-
-                            // Ajustamos el padding (en mm)
-                            const imgPadding = 0.5; 
-                            
-                            // Usar las dimensiones de la celda menos el doble del padding.
-                            const imgWidth = cellWidth - (2 * imgPadding);
-                            const imgHeight = cellHeight - (2 * imgPadding);
-                            
-                            doc.addImage(
-                                firmaDataURL, 
-                                'JPEG', 
-                                data.cell.x + imgPadding, 
-                                data.cell.y + imgPadding, 
-                                imgWidth, 
-                                imgHeight // Forzamos la altura y ancho de la celda
-                            );
-                        } else if (firmaDataURL === 'N/A') {
-                            // Centrar 'N/A' en la celda de la firma
-                            doc.setFontSize(7).setTextColor(100, 100, 100);
-                            doc.text('N/A', data.cell.x + (data.cell.width / 2), data.cell.y + (data.cell.height / 2), {
-                                 align: 'center', 
-                                 baseline: 'middle'
-                            });
-                        }
-                    } 
-                    
-                    // Aplicar el estilo condicional para el estado (Columna 6)
-                    if (data.column.index === 6 && data.cell.section === 'body') { 
-                        const status = data.cell.text[0];
-                        if (status === 'PENDIENTE') {
-                            data.cell.styles.fillColor = [248, 215, 218];
-                            doc.setTextColor(234, 88, 12); 
-                        } else if (status === 'DEVUELTO') {
-                            data.cell.styles.fillColor = [212, 237, 218]; 
-                            doc.setTextColor(22, 163, 74); 
-                        }
+            // Función para guardar datos del contenedor 
+            function saveContenedorData(inputElement) {
+                const field = inputElement.dataset.field;
+                const contRowIndex = inputElement.dataset.contRow;
+                const value = inputElement.value.trim();
+                const contData = dataContenedor[0];
+                
+                if (contRowIndex !== undefined) {
+                    const row = contData.rows[contRowIndex];
+                    if (field === 'temp_reg') {
+                        row.temp_reg = value.toUpperCase();
+                    } else if (field === 'seguridad') {
+                        row.seguridad = value;
+                    } else if (field === 'fecha_rev') {
+                        // Guardar la fecha en formato nativo del input (YYYY-MM-DD)
+                        row.fecha_rev = value; 
                     }
                 }
+                saveAndNotify();
+            }
+
+            // Nueva función para renderizar la tabla de Contenedor (Actualizada: Orden y formato de fecha)
+            function renderContenedor() {
+                const tbody = document.getElementById('contenedor-tbody');
+                tbody.innerHTML = '';
+                
+                if (!dataContenedor.length) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="color:var(--secondary-color);text-align:center;padding:20px;">Sin datos de contenedor.</td></tr>`;
+                    return;
+                }
+
+                const contData = dataContenedor[0]; 
+                const contRows = contData.rows;
+                const totalRows = contRows.length;
+                const todayDateInputFormat = getTodayDateFormattedForInput();
+
+                contRows.forEach((item, rowIndex) => {
+                    const tr = document.createElement('tr');
+                    
+                    // Solo la primera fila lleva el N° de Cont. y TEMP OBJETIVO con rowspan
+                    if (rowIndex === 0) {
+                        tr.innerHTML += `<td rowspan="${totalRows}">${contData.cont_num}</td>`;
+                        tr.innerHTML += `<td rowspan="${totalRows}">${contData.cont_temp_target}</td>`;
+                    }
+                    
+                    // Columna FECHA REVISIÓN (Editable, USA INPUT DATE)
+                    // Guardamos YYYY-MM-DD pero mostramos con el input type="date"
+                    tr.innerHTML += `
+                        <td class="editable-input">
+                            <input type="date" data-field="fecha_rev" data-cont-row="${rowIndex}" value="${item.fecha_rev || todayDateInputFormat}">
+                        </td>
+                    `;
+                    
+                    // Columna HORA REVISIÓN (Fija)
+                    tr.innerHTML += `<td class="fixed-hours">${item.hora}</td>`;
+
+                    // Columna TEMP. REG. (Editable)
+                    tr.innerHTML += `
+                        <td class="editable-input">
+                            <input type="text" inputmode="numeric" data-field="temp_reg" data-cont-row="${rowIndex}" value="${item.temp_reg || ''}">
+                        </td>
+                    `;
+                    
+                    // Columna SEGURIDAD (Editable)
+                    tr.innerHTML += `
+                        <td class="editable-input">
+                            <input type="text" data-field="seguridad" data-cont-row="${rowIndex}" value="${item.seguridad || ''}">
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(tr);
+
+                    // Event Listeners para la nueva tabla
+                    tr.querySelectorAll('td.editable-input input').forEach(input => {
+                        const field = input.dataset.field;
+                        
+                        input.addEventListener('focus', () => { activeInput = input; });
+                        input.addEventListener('blur', () => {
+                            if (activeInput === input && !btnDefrost.matches(':hover') && !btnLavado.matches(':hover')) { activeInput = null; }
+                            // Guardar datos al perder el foco
+                            saveContenedorData(input);
+                        });
+                        
+                        input.addEventListener('input', () => {
+                            // Lógica para aceptar "DEF" y validación para Temp. Reg.
+                            if (field === 'temp_reg') {
+                                const value = input.value.trim().toUpperCase();
+                                // (Lógica de validación)
+                            }
+                        });
+                    });
+                });
+            }
+
+            function render() {
+                renderChips();
+                // Ocultar todos los contenedores de tabla
+                temperaturasTableContainer.style.display = 'none';
+                revisionesTableContainer.style.display = 'none';
+                contenedorTableContainer.style.display = 'none'; // Ocultar el nuevo contenedor
+                
+                // OCULTAR AMBOS BOTONES FLOTANTES POR DEFECTO
+                btnDefrost.style.display = 'none';
+                btnLavado.style.display = 'none';
+
+
+                if (seccionActiva === 'TEMPERATURAS') {
+                    mainTitle.textContent = 'REVISIÓN DE TEMPERATURAS';
+                    temperaturasTableContainer.style.display = 'block';
+                    // Mostrar DEF y LAV en TEMPERATURAS
+                    btnDefrost.style.display = 'block';
+                    btnLavado.style.display = 'block';
+                    renderTemperaturas();
+                } else if (seccionActiva === 'REVISIONES') {
+                    mainTitle.textContent = 'REVISIÓN DE INSTALACIONES';
+                    revisionesTableContainer.style.display = 'block';
+                    renderRevisiones();
+                } else if (seccionActiva === 'CONTENEDOR') { // Sección cambiada a singular
+                    mainTitle.textContent = 'CONTROL DE TEMPERATURA DE CONTENEDOR';
+                    contenedorTableContainer.style.display = 'block';
+                    // Mostrar solo DEF en CONTENEDOR
+                    btnDefrost.style.display = 'block'; 
+                    btnLavado.style.display = 'none'; // Asegurar que LAV no aparezca
+                    renderContenedor();
+                }
+            }
+            
+            function renderTemperaturas() {
+                 let dataToRender = dataTemperaturas;
+                 let tbody = document.getElementById('temperaturas-tbody');
+                 tbody.innerHTML = '';
+                 
+                 dataToRender.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td data-field="temp">${item.temp || ''}</td>
+                        <td class="left product-sensitive">${item.nevera || ''}</td>
+                        <td class="editable-input"><input type="text" inputmode="numeric" data-field="t2200" data-row="${index}" value="${item.t2200 || ''}"></td>
+                        <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0000" data-row="${index}" value="${item.t0000 || ''}"></td>
+                        <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0200" data-row="${index}" value="${item.t0200 || ''}"></td>
+                        <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0400" data-row="${index}" value="${item.t0400 || ''}"></td>
+                    `;
+                    tr.querySelectorAll('td.editable-input input').forEach(input => {
+                        input.addEventListener('focus', () => { activeInput = input; });
+                        input.addEventListener('blur', () => {
+                            // Revisar si la pérdida de foco es por click en DEF o LAV
+                            if (activeInput === input && !btnDefrost.matches(':hover') && !btnLavado.matches(':hover')) { activeInput = null; }
+                            const field = input.dataset.field;
+                            dataToRender[index][field] = input.value.trim().toUpperCase();
+                            saveAndNotify();
+                        });
+                        input.addEventListener('input', () => {
+                             const value = input.value.trim().toUpperCase();
+                             // Permitir DEF, LAV o temperatura válida
+                             const isValid = value === '' || value === 'DEF' || value === 'LAV' || validateTemperature(value);
+                             // (Lógica de validación visual si fuera necesario)
+                        });
+                    });
+                    tbody.appendChild(tr);
+                 });
+            }
+            
+            function renderRevisiones() {
+                let dataToRender = dataRevisiones;
+                let tbody = document.getElementById('revisiones-tbody');
+                tbody.innerHTML = '';
+                
+                 dataToRender.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td data-field="area">${item.area || ''}</td>
+                        <td class="editable" contenteditable="true" data-field="rev1">${item.rev1 || ''}</td>
+                        <td class="editable" contenteditable="true" data-field="obs1">${item.obs1 || ''}</td>
+                        <td class="editable" contenteditable="true" data-field="rev2">${item.rev2 || ''}</td>
+                        <td class="editable" contenteditable="true" data-field="obs2">${item.obs2 || ''}</td>
+                        <td class="editable" contenteditable="true" data-field="rev3">${item.rev3 || ''}</td>
+                        <td class="editable" contenteditable="true" data-field="obs3">${item.obs3 || ''}</td>
+                    `;
+                    tr.querySelectorAll('td.editable').forEach(td => {
+                        td.addEventListener('blur', () => {
+                            const field = td.dataset.field;
+                            dataToRender[index][field] = td.innerText.trim();
+                            saveAndNotify();
+                        });
+                    });
+                    tbody.appendChild(tr);
+                 });
+            }
+
+            function renderChips() {
+                chipsEl.innerHTML = '';
+                DEFAULT_SECCIONES.forEach(s => {
+                    const b = document.createElement('div');
+                    b.className = 'chip' + (s === seccionActiva ? ' active' : '');
+                    b.textContent = s;
+                    b.onclick = () => {
+                        seccionActiva = s;
+                        render();
+                    };
+                    chipsEl.appendChild(b);
+                });
+            }
+
+            // LÓGICA DEL BOTÓN DEFROST (DEF)
+            btnDefrost.addEventListener('click', () => {
+                if (activeInput) {
+                    const field = activeInput.dataset.field;
+                    
+                    // DEF aplica a las celdas de tiempo en Temperaturas y Contenedor
+                    if (field === 'temp_reg' || (seccionActiva === 'TEMPERATURAS' && field.startsWith('t'))) {
+                        activeInput.value = 'DEF';
+                        activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        
+                        if (seccionActiva === 'CONTENEDOR') {
+                            saveContenedorData(activeInput);
+                        } else if (seccionActiva === 'TEMPERATURAS') {
+                             const index = activeInput.dataset.row;
+                             dataTemperaturas[index][field] = 'DEF';
+                             saveAndNotify();
+                        }
+                        
+                        activeInput.blur(); 
+                        activeInput = null;
+                    } else {
+                        showToast('DEF solo aplica a celdas de Temperatura.', 'fas fa-info-circle', 2000);
+                    }
+                } else {
+                    showToast('Toque una celda de temperatura primero.', 'fas fa-info-circle', 2000);
+                }
             });
 
-            const filename = `Reporte_ControlLlaves_${new Date().toISOString().slice(0, 10)}.pdf`;
-            doc.save(filename);
+            // LÓGICA DEL BOTÓN LAVADO (LAV) - NUEVO
+            btnLavado.addEventListener('click', () => {
+                if (activeInput) {
+                    const field = activeInput.dataset.field;
+                    
+                    // LAV aplica solo a las celdas de tiempo en la sección TEMPERATURAS
+                    if (seccionActiva === 'TEMPERATURAS' && field.startsWith('t')) {
+                        activeInput.value = 'LAV';
+                        activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        
+                        const index = activeInput.dataset.row;
+                        dataTemperaturas[index][field] = 'LAV';
+                        saveAndNotify();
+                        
+                        activeInput.blur(); 
+                        activeInput = null;
+                    } else {
+                        showToast('LAV solo aplica a celdas de Temperatura en la sección Temperaturas.', 'fas fa-info-circle', 2500);
+                    }
+                } else {
+                    showToast('Toque una celda de temperatura primero.', 'fas fa-info-circle', 2000);
+                }
+            });
 
-            showMessage(`PDF de reporte diario generado y descargado: ${filename}`, 'success');
-        }
+
+            btnClear.onclick = () => {
+                clearModal.style.display = 'flex';
+            };
+            clearModalConfirmBtn.onclick = () => {
+                if (seccionActiva === 'TEMPERATURAS') {
+                    dataTemperaturas = dataTemperaturas.map(item => ({ ...item, t2200: '', t0000: '', t0200: '', t0400: '' }));
+                } else if (seccionActiva === 'REVISIONES') {
+                    dataRevisiones = dataRevisiones.map(item => ({ ...item, rev1: '', obs1: '', rev2: '', obs2: '', rev3: '', obs3: '' }));
+                } else if (seccionActiva === 'CONTENEDOR') {
+                    // Borra solo las partes editables del contenedor
+                    dataContenedor[0].rows.forEach(row => { 
+                        row.fecha_rev = '';
+                        row.temp_reg = ''; 
+                        row.seguridad = ''; 
+                    });
+                }
+                
+                // Borra los nombres de los campos de revisión
+                vespertinoNombreInput.value = '';
+                nocturnoNombreInput.value = '';
+                localStorage.removeItem(STORAGE_KEY_VESPERTINO);
+                localStorage.removeItem(STORAGE_KEY_NOCTURNO);
+                
+                saveAndNotify();
+                render();
+                clearModal.style.display = 'none';
+            };
+            clearModalCancelBtn.onclick = () => { clearModal.style.display = 'none'; };
+            allCloseBtns.forEach(btn => {
+                btn.onclick = () => { btn.closest('.modal').style.display = 'none'; };
+            });
+
+            openTermsModalBtn.onclick = (e) => {
+                e.preventDefault();
+                termsModal.style.display = 'flex';
+            };
+
+            openPrivacyModalBtn.onclick = (e) => {
+                e.preventDefault();
+                privacyModal.style.display = 'flex';
+            };
+
+            window.onclick = (event) => {
+                if (event.target === clearModal) clearModal.style.display = 'none';
+                if (event.target === termsModal) termsModal.style.display = 'none';
+                if (event.target === privacyModal) privacyModal.style.display = 'none';
+            };
+
+            // ******************************************************************
+            // ************ FUNCIÓN DE EXPORTACIÓN CON jsPDF.autoTable() *********
+            // ******************************************************************
+            btnExport.onclick = () => {
+                
+                if (seccionActiva === 'TEMPERATURAS' && !dataTemperaturas.length) {
+                    showToast('No hay datos de temperaturas para exportar.', 'fas fa-exclamation-triangle', 3000);
+                    return;
+                }
+                if (seccionActiva === 'REVISIONES' && !dataRevisiones.length) {
+                    showToast('No hay datos de revisiones para exportar.', 'fas fa-exclamation-triangle', 3000);
+                    return;
+                }
+                if (seccionActiva === 'CONTENEDOR' && !dataContenedor.length) {
+                    showToast('No hay datos de contenedor para exportar.', 'fas fa-exclamation-triangle', 3000);
+                    return;
+                }
+
+                if (typeof window.jspdf === 'undefined' || typeof window.jspdf.AcroForm === 'undefined') {
+                    showToast('Error: Librería de jsPDF o AutoTable no cargada.', 'fas fa-times-circle', 4000);
+                    return;
+                }
+
+                const loadingToast = showLoadingToast('Generando PDF... por favor espere.');
+
+                setTimeout(() => { 
+                    try {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF('p', 'mm', 'a4'); 
+                        const marginX = 15;
+                        const pageHeight = doc.internal.pageSize.height;
+
+                        const vespertinoNombre = vespertinoNombreInput.value.trim();
+                        const nocturnoNombre = nocturnoNombreInput.value.trim();
+
+                        const reviewDateValue = reviewDateInput.value;
+                        let formattedReviewDate = formatYyyyMmDdToDmy(reviewDateValue) || 
+                            formatDateToDmy(new Date()); // Si el input está vacío, usa la fecha actual
+
+                        // Función para añadir el encabezado del documento
+                        const addHeader = (doc, title, startY = 15) => { 
+                            let yPos = startY;
+
+                            doc.setFontSize(16).setFont('helvetica', 'bold');
+                            doc.text("GRUPO RIBA SMITH", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                            yPos += 6;
+                            doc.setFontSize(12).setFont('helvetica', 'normal');
+                            doc.text("R/S CHITRÉ SELECTO", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                            yPos += 5;
+
+                            doc.setFontSize(12).setFont('helvetica', 'bold');
+                            const titleLines = doc.splitTextToSize(title, doc.internal.pageSize.width - marginX * 2);
+                            doc.text(titleLines, doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                            yPos += (titleLines.length * 5) + 3;
+
+                            doc.setFontSize(10).setFont('helvetica', 'bold'); 
+                            const detailHeight = 5;
+
+                            doc.text(`Fecha de Revisión:`, marginX, yPos);
+                            doc.text(`Revisión Vespertina:`, doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                            doc.text(`Revisión Nocturna:`, doc.internal.pageSize.width - marginX, yPos, { align: 'right' });
+
+                            yPos += detailHeight - 1; 
+
+                            doc.setFontSize(10).setFont('helvetica', 'normal'); 
+                            doc.text(formattedReviewDate, marginX, yPos); // Usa el nuevo formato
+                            doc.text(vespertinoNombre || "________________", doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+                            doc.text(nocturnoNombre || "________________", doc.internal.pageSize.width - marginX, yPos, { align: 'right' });
+
+                            yPos += detailHeight + 5;
+                            return yPos;
+                        };
+                        
+                        // Función para añadir pie de página
+                        const addFooter = (doc, data) => {
+                            doc.setFontSize(8).setFont('helvetica', 'normal');
+                            const footerText = 'Powered by Rafael Ramos';
+                            doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
+                            
+                            // Numeración de página
+                            doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
+                        };
+
+                        let currentY = 0; 
+                        let PDF_MAIN_TITLE = '';
+
+                        // *** LÓGICA DE GENERACIÓN: CONTENEDOR SOLO ***
+                        if (seccionActiva === 'CONTENEDOR') {
+                            
+                            PDF_MAIN_TITLE = "CONTROL DE TEMPERATURA DE CONTENEDOR";
+                            currentY = addHeader(doc, PDF_MAIN_TITLE);
+                            const contData = dataContenedor[0]; 
+                             
+                            const contHeaders = [
+                                { header: 'N° DE CONT.', dataKey: 'cont_num' },
+                                { header: 'TEMP OBJETIVO', dataKey: 'cont_temp_target' },
+                                { header: 'FECHA REVISIÓN', dataKey: 'fecha_rev' }, // NUEVO ORDEN
+                                { header: 'HORA REVISIÓN', dataKey: 'hora' },      // NUEVO ORDEN
+                                { header: 'TEMP. REG.', dataKey: 'temp_reg' },
+                                { header: 'SEGURIDAD', dataKey: 'seguridad' },
+                            ];
+                            
+                            const contBody = contData.rows.map((row, index) => {
+                                // Convertir la fecha guardada (YYYY-MM-DD) a (DD/MM/YYYY) para el PDF
+                                const formattedFechaRev = formatYyyyMmDdToDmy(row.fecha_rev); 
+
+                                const containerRow = [
+                                    formattedFechaRev || '',  // 1. FECHA REVISIÓN (Formato DD/MM/YYYY)
+                                    row.hora,                 // 2. HORA REVISIÓN
+                                    row.temp_reg || '',       // 3. TEMP. REG.
+                                    row.seguridad || '',      // 4. SEGURIDAD
+                                ];
+                                
+                                // Insertar el Contenedor y la Temperatura Objetivo en la primera fila.
+                                if (index === 0) {
+                                    containerRow.unshift(contData.cont_temp_target);
+                                    containerRow.unshift(contData.cont_num);
+                                }
+                                
+                                return containerRow;
+                            });
+                            
+                            // *** APLICACIÓN DEL ROWSPAN EN LA MATRIZ DE DATOS ***
+                            if (contBody.length > 0) {
+                                const rowSpanValue = contBody.length;
+                                // Columna N° DE CONT. (Índice 0)
+                                contBody[0][0] = { content: contData.cont_num, rowSpan: rowSpanValue, styles: { valign: 'middle' } };
+                                // Columna TEMP OBJETIVO (Índice 1)
+                                contBody[0][1] = { content: contData.cont_temp_target, rowSpan: rowSpanValue, styles: { valign: 'middle' } };
+                            }
+                            // *** FIN APLICACIÓN DEL ROWSPAN ***
+
+
+                            doc.autoTable({
+                                startY: currentY,
+                                head: [contHeaders.map(h => h.header)],
+                                body: contBody,
+                                theme: 'grid',
+                                styles: { fontSize: 8, cellPadding: 2, halign: 'center' },
+                                headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], fontStyle: 'bold' },
+                                columnStyles: {
+                                    0: { cellWidth: 25 }, // N° CONT
+                                    1: { cellWidth: 25 }, // TEMP OBJETIVO
+                                    2: { cellWidth: 25 }, // FECHA REVISION (Aumentado ancho para DD/MM/YYYY)
+                                    3: { cellWidth: 20 }, // HORA REVISION
+                                    4: { cellWidth: 35 }, // TEMP. REG.
+                                    5: { cellWidth: 40 }, // SEGURIDAD
+                                },
+                                tableWidth: 'wrap', 
+                                margin: { left: marginX, right: marginX, top: 15, bottom: 15 },
+                                didDrawPage: (data) => {
+                                    addFooter(doc, data);
+                                }
+                            });
+                            
+                            currentY = doc.autoTable.previous.finalY;
+                            
+                            // AÑADIR OBSERVACIONES DEL CONTENEDOR (DESPUÉS DE LA TABLA)
+                            doc.setFontSize(10).setFont('helvetica', 'bold');
+                            currentY += 5;
+                            doc.text("Observación:", marginX, currentY);
+                            currentY += 5;
+
+                            doc.setFontSize(8).setFont('helvetica', 'normal');
+                            const obs1 = '1- Cuando el contenedor mantiene la luz roja donde dice DEFROST es porque se mantiene en descongelamiento y la temperatura debe llegar a -16° y luego ir bajando.';
+                            const obs2 = '2- El personal cuando proceda a introducir o a retirar mercancía del contenedor deberá apagarlo y cuando terminen de introducir o retirar mercancía nuevamente encenderlo.';
+                            
+                            const obs1Lines = doc.splitTextToSize(obs1, doc.internal.pageSize.width - marginX * 2);
+                            doc.text(obs1Lines, marginX, currentY);
+                            currentY += (obs1Lines.length * 4);
+                            
+                            const obs2Lines = doc.splitTextToSize(obs2, doc.internal.pageSize.width - marginX * 2);
+                            doc.text(obs2Lines, marginX, currentY);
+                            currentY += (obs2Lines.length * 4);
+
+                        }
+                        
+                        // *** LÓGICA DE GENERACIÓN: TEMPERATURAS Y REVISIONES ***
+                        if (seccionActiva === 'TEMPERATURAS' || seccionActiva === 'REVISIONES') {
+                            
+                            // 1. Añadir el encabezado para el reporte combinado
+                            PDF_MAIN_TITLE = "REPORTE DE REVISIÓN Y TEMPERATURAS";
+                            currentY = addHeader(doc, PDF_MAIN_TITLE);
+                            
+                            // 2. Generar Tabla de Temperaturas
+                            const tempHeaders = [
+                                { header: 'TEMP', dataKey: 'temp' },
+                                { header: 'NEVERAS', dataKey: 'nevera' },
+                                { header: '22:00', dataKey: 't2200' },
+                                { header: '00:00', dataKey: 't0000' },
+                                { header: '02:00', dataKey: 't0200' },
+                                { header: '04:00', dataKey: 't0400' },
+                            ];
+                            const tempBody = dataTemperaturas.map(d => [
+                                d.temp || '', d.nevera || '', d.t2200 || '', d.t0000 || '', d.t0200 || '', d.t0400 || ''
+                            ]);
+                            
+                            doc.autoTable({
+                                startY: currentY, 
+                                head: [tempHeaders.map(h => h.header)], 
+                                body: tempBody, 
+                                theme: 'grid', 
+                                styles: { fontSize: 8, cellPadding: 2, halign: 'center' },
+                                headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], fontStyle: 'bold' },
+                                columnStyles: { 
+                                    0: { cellWidth: 15 }, 
+                                    // Aumentamos ligeramente el ancho de NEVERAS a 65
+                                    1: { cellWidth: 65, halign: 'left' }, 
+                                    2: { cellWidth: 20 }, // Reducimos las horas
+                                    3: { cellWidth: 20 }, // Reducimos las horas
+                                    4: { cellWidth: 20 }, // Reducimos las horas
+                                    5: { cellWidth: 20 }  // Reducimos las horas
+                                },
+                                tableWidth: 'wrap', 
+                                margin: { left: marginX, right: marginX, top: 15, bottom: 15 }, 
+                                didDrawPage: (data) => {
+                                    addFooter(doc, data);
+                                }
+                            });
+                            currentY = doc.autoTable.previous.finalY;
+
+                            // 3. Generar Tabla de Revisiones
+                            
+                            // *** CAMBIO CLAVE: Forzar la nueva página para la tabla de Revisiones ***
+                            doc.addPage(); 
+                            currentY = 15; 
+                            // *** FIN CAMBIO CLAVE ***
+
+                            const revHeaders = [
+                                { header: 'PUERTAS Y/O ÁREAS', dataKey: 'area' },
+                                { header: 'REV. N°1', dataKey: 'rev1' },
+                                { header: 'OBSERVACIÓN', dataKey: 'obs1' },
+                                { header: 'REV. N°2', dataKey: 'rev2' },
+                                { header: 'OBSERVACIÓN', dataKey: 'obs2' },
+                                { header: 'REV. N°3', dataKey: 'rev3' },
+                                { header: 'OBSERVACIÓN', dataKey: 'obs3' },
+                            ];
+                            const revBody = dataRevisiones.map(d => [
+                                d.area || '', d.rev1 || '', d.obs1 || '', d.rev2 || '', d.obs2 || '', d.rev3 || '', d.obs3 || ''
+                            ]);
+                            
+                            doc.autoTable({
+                                startY: currentY, 
+                                head: [revHeaders.map(h => h.header)], 
+                                body: revBody, 
+                                theme: 'grid', 
+                                styles: { fontSize: 8, cellPadding: 2, halign: 'center' },
+                                headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], fontStyle: 'bold' },
+                                columnStyles: { 
+                                    0: { cellWidth: 40, halign: 'left' }, 
+                                    1: { cellWidth: 14 }, 
+                                    2: { cellWidth: 32 }, 
+                                    3: { cellWidth: 14 }, 
+                                    4: { cellWidth: 32 }, 
+                                    5: { cellWidth: 14 }, 
+                                    6: { cellWidth: 32 } 
+                                },
+                                tableWidth: 'wrap', 
+                                margin: { left: marginX, right: marginX, top: 15, bottom: 15 },
+                                didDrawPage: (data) => {
+                                    addFooter(doc, data);
+                                }
+                            });
+                        }
+                        
+                        // **** FIN DE LÓGICA DE CONTENIDO DINÁMICO ****
+
+                        doc.save(`Revision_y_Temperatura_${seccionActiva}_${formattedReviewDate.replace(/\//g, '-')}.pdf`);
+
+                        hideToast(loadingToast);
+                        showToast('¡PDF guardado con éxito!', 'fas fa-check-circle', 4000);
+                    } catch (e) {
+                        console.error("Error al generar el PDF:", e);
+                        hideToast(loadingToast);
+                        showToast('Error al generar el PDF. Revise la consola.', 'fas fa-times-circle', 5000);
+                    }
+                }, 100);
+            };
+            // ******************************************************************
+            // ************ FIN DE FUNCIÓN CON jsPDF.autoTable() ****************
+            // ******************************************************************
+
+
+            function openNav() {
+                document.getElementById("mySidebar").style.width = "250px";
+            }
+
+            function closeNav() {
+                document.getElementById("mySidebar").style.width = "0";
+            }
+
+            window.addEventListener("load", () => {
+                // Esconde la pantalla de inicio
+                setTimeout(() => { document.getElementById("splash").style.opacity = "0"; }, 1500);
+                setTimeout(() => { document.getElementById("splash").style.display = "none"; }, 2000);
+
+                // Carga la fecha y los nombres guardados
+                if (!reviewDateInput.value) {
+                    reviewDateInput.value = getTodayDateFormattedForInput();
+                }
+                const vespertinoNombreGuardado = localStorage.getItem(STORAGE_KEY_VESPERTINO);
+                if (vespertinoNombreGuardado) {
+                    vespertinoNombreInput.value = vespertinoNombreGuardado;
+                }
+                const nocturnoNombreGuardado = localStorage.getItem(STORAGE_KEY_NOCTURNO);
+                if (nocturnoNombreGuardado) {
+                    nocturnoNombreInput.value = nocturnoNombreGuardado;
+                }
+                
+                render();
+
+                vespertinoNombreInput.addEventListener('input', saveAndNotify);
+                nocturnoNombreInput.addEventListener('input', saveAndNotify);
+            });
+        })();
     </script>
 </body>
 </html>
