@@ -440,7 +440,7 @@
         <h2>REVISIÓN Y</h2>
         <h2>TEMPERATURA</h2>
         <p>Powered by Rafael Ramos</p>
-        <p>Versión 1.5</p>
+        <p>Versión 2.0</p>
     </div>
 
     <div class="main-container">
@@ -1163,8 +1163,15 @@
                         let formattedReviewDate = formatYyyyMmDdToDmy(reviewDateValue) || 
                             formatYyyyMmDdToDmy(getTodayDateFormattedForInput());
                         
-                        // MODIFICACIÓN: Nombre de archivo unificado para Temperaturas/Revisiones/Contenedor
-                        const filename = `Revision_y_Temperatura_${formattedReviewDate.replace(/\//g, '-')}.pdf`; 
+                        // INICIO MODIFICACIÓN 1: Nombre de archivo condicional
+                        let filename;
+                        if (seccionActiva === 'CONTENEDOR') {
+                            filename = `Revision_y_Temperatura_CONTENEDOR_${formattedReviewDate.replace(/\//g, '-')}.pdf`; 
+                        } else {
+                            // Para TEMPERATURAS y REVISIONES (unificado)
+                            filename = `Revision_y_Temperatura_${formattedReviewDate.replace(/\//g, '-')}.pdf`; 
+                        }
+                        // FIN MODIFICACIÓN 1
 
                         // Función para añadir el encabezado del documento
                         const addHeader = (doc, title, showRevisores, startY = 15) => { 
@@ -1308,7 +1315,7 @@
                         }
                         
                         // =========================================================================
-                        // *** LÓGICA de GENERACIÓN: TEMPERATURAS y REVISIONES ***
+                        // *** LÓGICA de GENERACIÓN: TEMPERATURAS y REVISIONES (Consolidado) ***
                         // =========================================================================
                         if (seccionActiva === 'TEMPERATURAS' || seccionActiva === 'REVISIONES') {
                             
@@ -1356,10 +1363,13 @@
                             
                             // 2. Generar Tabla de Revisiones
                             if (dataRevisiones.length) {
-                                // Añadir página si no cabe o si la sección actual es REVISIONES y se generó TEMPERATURAS primero
-                                if (currentY > (pageHeight - 40) || seccionActiva === 'REVISIONES') {
+                                // MODIFICACIÓN 2: Generar una nueva página SOLO si la tabla no cabe en la página actual.
+                                const tableHeightEstimate = dataRevisiones.length * 4 + 10; // Estimación simple
+                                if ((currentY + 10 + tableHeightEstimate) > (pageHeight - 25)) { // 25 para margen de pie
                                     doc.addPage();
-                                    currentY = addHeader(doc, PDF_MAIN_TITLE, true); 
+                                    currentY = addHeader(doc, PDF_MAIN_TITLE, true); // Añadir encabezado en la nueva página
+                                } else {
+                                     currentY += 5; // Separación si se queda en la misma página
                                 }
                                 
                                 const revHeaders = [
@@ -1392,7 +1402,7 @@
                                         6: { cellWidth: 32 }, 
                                     },
                                     tableWidth: 'wrap', 
-                                    margin: { left: marginX, right: marginX, top: 15, bottom: 15 },
+                                    margin: { left: marginX, right: marginX, top: 0, bottom: 15 }, // Top 0 para que siga de la tabla anterior
                                     didDrawPage: (data) => {
                                         addFooter(doc);
                                     }
