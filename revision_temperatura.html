@@ -948,7 +948,7 @@
                 } else if (seccionActiva === 'CONTENEDOR') {
                     dataToRender = dataContenedor;
                     tableContainer = contenedorTableContainer;
-                    title = 'CONTROL DE TEMPERATURA DE CONTENEDOR';
+                    title = 'REVISIÓN DE CONTENEDOR';
                     
                     btnDefrost.style.display = 'block'; 
                     btnLavado.style.display = 'none'; // Ocultar LAV en contenedor
@@ -967,10 +967,10 @@
                     tr.innerHTML = `
                         <td data-field="temp">${item.temp || ''}</td>
                         <td class="left product-sensitive">${item.nevera || ''}</td>
-                        <td class="editable-input"><input type="text" inputmode="text" data-field="t2200" data-row="${index}" value="${item.t2200 || ''}"></td>
-                        <td class="editable-input"><input type="text" inputmode="text" data-field="t0000" data-row="${index}" value="${item.t0000 || ''}"></td>
-                        <td class="editable-input"><input type="text" inputmode="text" data-field="t0200" data-row="${index}" value="${item.t0200 || ''}"></td>
-                        <td class="editable-input"><input type="text" inputmode="text" data-field="t0400" data-row="${index}" value="${item.t0400 || ''}"></td>
+                        <td class="editable-input"><input type="text" inputmode="numeric" data-field="t2200" data-row="${index}" value="${item.t2200 || ''}"></td>
+                        <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0000" data-row="${index}" value="${item.t0000 || ''}"></td>
+                        <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0200" data-row="${index}" value="${item.t0200 || ''}"></td>
+                        <td class="editable-input"><input type="text" inputmode="numeric" data-field="t0400" data-row="${index}" value="${item.t0400 || ''}"></td>
                     `;
                     tr.querySelectorAll('td.editable-input input').forEach(input => {
                         input.addEventListener('focus', () => { activeInput = input; });
