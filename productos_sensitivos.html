@@ -12,23 +12,24 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    
+
 
     <style>
         /* Paleta y estilos principales del código original */
         :root {
-            --primary-color: #2c3e50; /* Deep Blue-Grey del Codigo 1 */
-            --secondary-color: #7f8c8d; /* Muted Grey del Codigo 1 */
-            --accent-color: #3498db; /* Corporate Blue del Codigo 1 */
-            --bg-light: #f4f7f9; /* Lighter Grey-Blue Background del Codigo 1 */
-            --bg-card: #ffffff; /* White Card Background del Codigo 1 */
-            --border-color: #e0e6ea; /* Subtle Border del Codigo 1 */
+            --primary-color: #2c3e50;
+            --secondary-color: #7f8c8d;
+            --accent-color: #3498db;
+            --bg-light: #f4f7f9;
+            --bg-card: #ffffff;
+            --border-color: #e0e6ea;
             --success-color: #2ecc71;
             --warning-color: #f39c12;
             --danger-color: #e74c4c;
             --font-main: 'Poppins', sans-serif;
             --highlight-green: #d4edda;
             --highlight-red: #f8d7da;
+            --highlight-yellow: #fff3cd; /* Agregada para consistencia */
         }
 
         /* Estilos generales y resets */
@@ -40,12 +41,12 @@
             padding-bottom: 80px;
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            -moz-osx-smoothing: grayscale;
         }
         .main-content {
             padding: 20px;
             max-width: 960px;
-            margin: 40px auto; /* Añadido margen superior para mejor look */
+            margin: 40px auto;
             background: var(--bg-card);
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
@@ -63,7 +64,7 @@
             background: var(--primary-color); color: #fff;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 9999;
-            transition: opacity 0.7s ease-out; /* Transición más larga */
+            transition: opacity 0.7s ease-out;
             text-align: center;
         }
         #splash img { width: 120px; margin-bottom: 20px; }
@@ -181,28 +182,116 @@
         }
         .chip:hover { transform: translateY(-1px); }
 
-        /* Nuevo estilo para el recuadro de fecha */
+        /* --- INICIO: ESTILOS MODIFICADOS PARA FECHA Y BÚSQUEDA --- */
+        /* Estilo para el recuadro de fecha y contenedor de búsqueda */
         .date-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px; /* Más espacio entre elementos */
             margin-bottom: 20px;
-            justify-content: center;
+            justify-content: flex-start; /* Alineación a la izquierda por defecto */
+            flex-wrap: wrap; /* Permite que los elementos pasen a la siguiente línea en móviles */
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color); /* Separador visual */
         }
+        /* Centrar en pantallas grandes */
+        @media (min-width: 600px) {
+            .date-container {
+                justify-content: center;
+            }
+        }
+
         .date-container label {
             font-weight: 600;
             font-size: 14px;
             color: var(--primary-color);
+            white-space: nowrap; /* Evita que el texto de la etiqueta se rompa */
         }
         .date-container input[type="date"] {
-            padding: 10px 12px;
+            padding: 8px 10px; /* Tamaño ligeramente reducido */
             border: 1px solid var(--border-color);
             border-radius: 8px;
             font-family: var(--font-main);
-            font-size: 16px;
+            font-size: 14px;
             background: var(--bg-light);
             transition: all 0.3s ease;
+            max-width: 150px;
         }
+
+        /* --- ESTILO DE BÚSQUEDA MINIMIZADA/EXPANDIBLE (RENOVADO) --- */
+        .search-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* Alineación a la derecha en el contenedor flex */
+            flex-grow: 1; /* Permite que el contenedor de búsqueda ocupe el espacio restante */
+            min-width: 40px;
+            order: 10; /* Empujar al final de la línea en pantallas pequeñas si hay wrap */
+        }
+        @media (min-width: 600px) {
+            .search-container {
+                flex-grow: 0; /* No crece tanto en pantallas grandes */
+                order: initial;
+            }
+        }
+
+        #searchWrapper {
+            display: flex;
+            align-items: center;
+            background: var(--bg-light);
+            border-radius: 50px;
+            overflow: hidden;
+            width: 40px; /* Tamaño inicial de la lupa */
+            transition: width 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        #searchWrapper.expanded {
+            width: 250px; /* Ancho de la barra expandida en pantallas normales */
+            max-width: 90vw;
+            background: var(--bg-card);
+            border: 1px solid var(--accent-color); /* Borde acentuado al expandir */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        #searchButton {
+            background: transparent;
+            border: none;
+            color: var(--primary-color);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 10px;
+            transition: color 0.3s;
+            flex-shrink: 0;
+        }
+        #searchWrapper.expanded #searchButton {
+            color: var(--accent-color); /* Color de la lupa al expandir */
+        }
+
+        #searchInput {
+            flex-grow: 1;
+            padding: 10px 0;
+            border: none;
+            font-size: 16px;
+            font-family: var(--font-main);
+            outline: none;
+            width: 0; /* Oculto inicialmente */
+            opacity: 0;
+            transition: width 0.3s ease, opacity 0.3s ease;
+            background: transparent;
+        }
+
+        #searchWrapper.expanded #searchInput {
+            width: 100%; /* Visible al expandirse */
+            padding: 10px 15px 10px 5px; 
+            opacity: 1;
+        }
+
+        /* Oculta los chips de sección cuando la barra de búsqueda está activa (es decir, en búsqueda global) */
+        .chips.hidden {
+            display: none;
+        }
+        /* --- FIN: ESTILOS MODIFICADOS PARA FECHA Y BÚSQUEDA --- */
+
 
         /* Tables */
         .table-container {
@@ -212,7 +301,7 @@
         }
         table {
             width: 100%;
-            border-collapse: collapse; /* Cambiado a collapse para el diseño corporativo */
+            border-collapse: collapse;
             font-size: 14px;
             background: var(--bg-card);
         }
@@ -238,7 +327,7 @@
             box-shadow: inset 0 0 0 2px var(--accent-color);
         }
         td[contenteditable="true"] { 
-            background: var(--bg-light); /* Fondo para indicar que es editable */
+            background: var(--bg-light);
             padding: 15px;
             outline: none;
             transition: box-shadow 0.3s;
@@ -251,7 +340,7 @@
         .increased { background-color: var(--highlight-green) !important; }
         .decreased { background-color: var(--highlight-red) !important; }
 
-        /* Toast notifications - MISMA POSICIÓN QUE EL CÓDIGO 1 */
+        /* Toast notifications */
         #toast-container {
             position: fixed;
             top: 30px; 
@@ -288,7 +377,7 @@
         .toast.warning { background-color: var(--warning-color); }
         .toast.error { background-color: var(--danger-color); }
 
-        /* Modals - IGUALES AL CÓDIGO 1 */
+        /* Modals */
         .modal {
             display: none;
             position: fixed;
@@ -331,7 +420,7 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes scaleIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* Footer - MISMO DISEÑO QUE EL CÓDIGO 1 */
+        /* Footer */
         .footer {
             text-align: center;
             margin-top: 40px;
@@ -360,7 +449,7 @@
         <h2>PRODUCTOS</h2>
         <h2>SENSITIVOS</h2>
         <p>Powered by Rafael Ramos.</p>
-        <p>Versión 2.0</p>
+        <p>Versión 2.5</p>
     </div>
 
     <div id="sideMenu" class="side-menu">
@@ -374,19 +463,28 @@
         <header>
             <div id="hamburgerBtn" class="hamburger-btn"><i class="fas fa-bars"></i></div>
             <div class="title-group">
-                <h1>GRUPO RIBA SMITH</h1>
+
                 <h1>R/S CHITRÉ SELECTO</h1>
                 <h1>LISTADO DE PRODUCTOS SENSITIVOS</h1>
             </div>
         </header>
-
+        
         <div class="date-container">
-            <label for="review-date"><i class="fas fa-calendar-alt"></i> Fecha de Revisión:</label>
+            <label for="review-date"><i class="fas fa-calendar-alt"></i> Fecha:</label>
             <input type="date" id="review-date">
+            
+            <div class="search-container">
+                <div id="searchWrapper">
+                    <button id="searchButton" title="Buscar Producto Globalmente">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <input type="text" id="searchInput" placeholder="Buscar Producto...">
+                </div>
+            </div>
         </div>
-
         <div class="controls-container">
-            <div class="chips" id="chips"></div>
+            <div class="chips" id="chips">
+                </div>
         </div>
 
         <div class="actions">
@@ -399,9 +497,10 @@
         <div class="table-container">
             <table id="tabla">
                 <thead>
-                    <tr>
+                    <tr id="tableHeader">
                         <th style="width: 10%;">PRECIO</th>
                         <th class="left product-sensitive" style="width: 40%;">PRODUCTO<br>SENSITIVO</th>
+                        <th id="headerSection" style="width: 15%; display: none;">SECCIÓN</th> 
                         <th style="width: 12.5%;">07:00</th>
                         <th style="width: 12.5%;">12:00</th>
                         <th style="width: 12.5%;">15:00</th>
@@ -455,6 +554,8 @@
                 <li><strong>Uso del Sistema:</strong> La aplicación está destinada únicamente para la gestión de productos sensitivos y el control de los mismos, como parte de las funciones laborales asignadas. Cualquier otro uso está estrictamente prohibido.</li>
                 <li><strong>Confidencialidad y Propiedad de Datos:</strong> Los datos registrados, incluyendo precios, nombres de productos y cualquier otra información ingresada, son propiedad exclusiva de R/S Chitré Selecto. Esta información es confidencial y no debe ser divulgada a terceros.</li>
                 <li><strong>Precisión de la Información:</strong> Usted es responsable de garantizar que la información que ingresa sea veraz, precisa y completa. Cualquier registro falso, inexacto o incompleto es de su única responsabilidad y podría ser sujeto a medidas disciplinarias.</li>
+                <li><strong>Propiedad Intelectual:</strong> La aplicación, incluyendo su código fuente, diseño, interfaz y contenido, es propiedad intelectual de Rafael Ramos y se prohíbe su copia, distribución o modificación sin autorización expresa.</li>
+                <li><strong>Limitación de Responsabilidad:</strong> Rafael Ramos no se hace responsable por daños directos o indirectos, pérdidas o inconvenientes que surjan del uso o la imposibilidad de usar esta aplicación, incluyendo fallas técnicas o errores humanos.</li>
                 <li><strong>Propiedad Intelectual:</strong> La aplicación, incluyendo su código fuente, diseño, interfaz y contenido, es propiedad intelectual de Rafael Ramos y se prohíbe su copia, distribución o modificación sin autorización expresa.</li>
                 <li><strong>Limitación de Responsabilidad:</strong> Rafael Ramos no se hace responsable por daños directos o indirectos, pérdidas o inconvenientes que surjan del uso o la imposibilidad de usar esta aplicación, incluyendo fallas técnicas o errores humanos.</li>
                 <li><strong>Modificaciones a los Términos:</strong> Nos reservamos el derecho de actualizar, modificar o reemplazar estos términos y condiciones en cualquier momento. El uso continuado de la aplicación después de cualquier modificación constituye su aceptación de los nuevos términos.</li>
@@ -521,8 +622,7 @@
                 console.warn('localStorage JSON corrupto, reiniciando datos:', e);
                 productos = [];
             }
-            let seccionActiva = productos.length > 0 ? productos[0].seccion : DEFAULT_SECCIONES[0]; // Asegura una sección activa al inicio
-            let insertIndex = null;
+            let seccionActiva = productos.length > 0 ? productos[0].seccion : DEFAULT_SECCIONES[0];
             let selectedRow = null;
             const tbody = document.getElementById('tbody');
             const chipsEl = document.getElementById('chips');
@@ -530,7 +630,7 @@
             const btnClear = document.getElementById('btnClear');
             const btnAdd = document.getElementById('btnAdd');
             const btnDeleteRow = document.getElementById('btnDeleteRow');
-            const toastContainer = document.getElementById('toast-container'); // Referencia al nuevo contenedor
+            const toastContainer = document.getElementById('toast-container'); 
             const fileInput = document.getElementById('fileInput');
             const btnExportJson_menu = document.getElementById('btnExportJson_menu');
             const btnImportJson_menu = document.getElementById('btnImportJson_menu');
@@ -550,7 +650,11 @@
             const allCloseBtns = document.querySelectorAll('.close-btn');
             const reviewDateInput = document.getElementById('review-date');
             
-            let currentToastElement = null; // Para loading toast
+            const searchInput = document.getElementById('searchInput');
+            const searchButton = document.getElementById('searchButton');
+            const searchWrapper = document.getElementById('searchWrapper');
+            const headerSection = document.getElementById('headerSection');
+            
             let saveTimer = null;
 
             function save() {
@@ -559,8 +663,9 @@
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(productos));
                 }, 300);
             }
+            
             // =========================================================================
-            // LÓGICA DE TOASTS (ADAPTADA DEL CÓDIGO 1)
+            // LÓGICA DE TOASTS
             // =========================================================================
             function showToast(message, type = 'success', duration = 3000) {
                 const toast = document.createElement('div');
@@ -585,38 +690,26 @@
                     default: return 'fas fa-info-circle';
                 }
             }
-
             function showLoadingToast(message) {
-                if (currentToastElement) hideToast(currentToastElement); 
-
                 const toast = document.createElement('div');
                 toast.className = 'toast loading-toast';
                 toast.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${message}`;
 
                 toastContainer.prepend(toast);
-                currentToastElement = toast;
-
                 setTimeout(() => { toast.classList.add('show'); }, 10); 
                 return toast;
             }
-
             function hideToast(toastElement) {
                 if (toastElement) {
                     toastElement.classList.remove('show');
-                    setTimeout(() => { 
-                        toastElement.remove(); 
-                        if (toastElement === currentToastElement) {
-                            currentToastElement = null;
-                        }
-                    }, 300);
+                    setTimeout(() => { toastElement.remove(); }, 300);
                 }
             }
             // =========================================================================
             // FIN LÓGICA DE TOASTS
             // =========================================================================
 
-
-            // Función para verificar diferencias en una sección (sólo muestra advertencia)
+            // --- FUNCIÓN MODIFICADA PARA NO INCLUIR EL NOMBRE DEL PRODUCTO ---
             function checkDifferencesInActiveSection() {
                 const list = productos.filter(p => p.seccion === seccionActiva);
                 const timeFields = ['t0700', 't1200', 't1500', 't2200'];
@@ -627,12 +720,13 @@
                         const prevVal = parseFloat(p[timeFields[i - 1]]);
 
                         if (!isNaN(currentVal) && !isNaN(prevVal) && currentVal < prevVal) {
-                            showToast('¡Advertencia! Se detectó una disminución en un valor de inventario.', 'warning');
+                            showToast(`¡Advertencia! Diferencia detectada.`, 'warning');
                             return; 
                         }
                     }
                 }
             }
+            // --- FIN DE FUNCIÓN MODIFICADA ---
 
             function renderChips() {
                 chipsEl.innerHTML = '';
@@ -641,9 +735,11 @@
                     b.className = 'chip' + (s === seccionActiva ? ' active' : '');
                     b.textContent = s;
                     b.onclick = () => {
-                        const previousSection = seccionActiva;
-                        if (s !== previousSection) {
+                        if (s !== seccionActiva) {
                             seccionActiva = s;
+                            searchInput.value = ''; // Limpiar la búsqueda al cambiar de sección
+                            searchWrapper.classList.remove('expanded'); // Contraer la barra
+                            chipsEl.classList.remove('hidden'); // Mostrar chips
                             render();
                             checkDifferencesInActiveSection();
                         }
@@ -651,6 +747,7 @@
                     chipsEl.appendChild(b);
                 });
             }
+
             const applyColorAndAlertLogic = (targetInput, suppressToast = true) => {
                 const currentRowInputs = Array.from(targetInput.closest('tr').querySelectorAll('input[type="number"]'));
                 const currentIndex = currentRowInputs.indexOf(targetInput);
@@ -661,33 +758,47 @@
                 // Limpiar todas las clases de coloración
                 targetInput.classList.remove('initial-highlight', 'increased', 'decreased');
 
-                // Si es la primera columna de tiempo, no hay comparación previa.
                 if (currentIndex === 0) return; 
 
                 if (!isNaN(currentValue) && !isNaN(prevValue)) {
                     if (currentValue < prevValue) {
                         targetInput.classList.add('decreased');
-                        if (!suppressToast) showToast('¡Advertencia! Disminución detectada.', 'warning', 2000);
+                        if (!suppressToast) showToast('¡Advertencia! Diferencia detectada.', 'warning', 2000);
                     } else if (currentValue > prevValue) {
                         targetInput.classList.add('increased');
                     }
                 }
             };
 
-            function createRowElement(p, indexInList) {
+            function createRowElement(p, indexInList, isGlobalSearch) {
                 const tr = document.createElement('tr');
                 tr.dataset.index = indexInList;
+                tr.dataset.seccion = p.seccion;
+
+                // Columna PRECIO
                 const tdPrecio = document.createElement('td');
                 tdPrecio.contentEditable = "true";
                 tdPrecio.dataset.field = "precio";
                 tdPrecio.textContent = p.precio || '';
                 tr.appendChild(tdPrecio);
+                
+                // Columna PRODUCTO SENSITIVO
                 const tdNombre = document.createElement('td');
                 tdNombre.className = 'left';
                 tdNombre.contentEditable = "true";
                 tdNombre.dataset.field = "nombre";
                 tdNombre.textContent = p.nombre || '';
                 tr.appendChild(tdNombre);
+
+                // Columna SECCIÓN (solo visible en búsqueda global)
+                if (isGlobalSearch) {
+                    const tdSeccion = document.createElement('td');
+                    tdSeccion.textContent = p.seccion || 'N/A';
+                    tdSeccion.style.display = 'table-cell'; // Mostrar la celda
+                    tr.appendChild(tdSeccion);
+                }
+
+                // Columnas de Horario
                 ['t0700','t1200','t1500','t2200'].forEach(field => {
                     const td = document.createElement('td');
                     const inp = document.createElement('input');
@@ -699,48 +810,61 @@
                 });
                 return tr;
             }
-            
+
             function render() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const isGlobalSearchActive = searchWrapper.classList.contains('expanded') && searchTerm;
+                
+                // Control de visibilidad de chips y encabezado
+                chipsEl.classList.toggle('hidden', isGlobalSearchActive);
+                headerSection.style.display = isGlobalSearchActive ? 'table-cell' : 'none';
+
+                let list;
+                if (isGlobalSearchActive) {
+                    // BÚSQUEDA GLOBAL: busca en todos los productos
+                    list = productos.filter(p => 
+                        (p.precio && String(p.precio).toLowerCase().includes(searchTerm)) ||
+                        (p.nombre && p.nombre.toLowerCase().includes(searchTerm)) ||
+                        (p.seccion && p.seccion.toLowerCase().includes(searchTerm))
+                    );
+                } else {
+                    // MODO NORMAL: solo muestra la sección activa
+                    list = productos.filter(p => p.seccion === seccionActiva);
+                }
+                
                 renderChips();
                 tbody.innerHTML = '';
                 selectedRow = null;
-                insertIndex = null;
-                const list = productos.filter(p => p.seccion === seccionActiva);
-                
+
                 if (!list.length) {
                     const tr = document.createElement('tr');
                     const td = document.createElement('td');
-                    td.colSpan = 6;
+                    // AJUSTE: colspan es 7 si la columna de sección está visible (búsqueda global), 6 si no.
+                    td.colSpan = isGlobalSearchActive ? 7 : 6; 
                     td.style.color = 'var(--secondary-color)';
                     td.style.textAlign = 'center';
                     td.style.padding = '20px';
-                    td.textContent = 'Sin productos en esta sección.';
+                    td.textContent = isGlobalSearchActive ? 'No se encontraron resultados en ninguna sección.' : 'Sin productos en esta sección.';
                     tr.appendChild(td);
                     tbody.appendChild(tr);
                     return;
                 }
-                
-                // Mapear el producto a su índice original antes de filtrar
-                const productsWithOriginalIndex = list.map(p => ({
-                    product: p,
-                    originalIndex: productos.indexOf(p)
-                }));
-                
-                productsWithOriginalIndex.forEach(item => {
-                    const { product: p, originalIndex } = item;
-                    const tr = createRowElement(p, originalIndex); // Usar originalIndex
+
+                list.forEach(p => {
+                    const originalIndex = productos.indexOf(p);
+                    const tr = createRowElement(p, originalIndex, isGlobalSearchActive);
 
                     tr.querySelectorAll('[contenteditable="true"]').forEach(td => {
                         td.addEventListener('blur', () => {
                             const field = td.dataset.field;
-                            const index = parseInt(tr.dataset.index); // Obtener el índice del atributo
+                            const index = parseInt(tr.dataset.index);
                             if (index > -1) {
                                 productos[index][field] = td.innerText.trim();
                                 save();
                             }
                         });
                     });
-                    
+
                     const inputs = Array.from(tr.querySelectorAll('input[type="number"]'));
                     inputs.forEach((inp, idx) => {
                         applyColorAndAlertLogic(inp, true);
@@ -748,12 +872,12 @@
                             const index = parseInt(tr.dataset.index);
                             const field = inp.dataset.field;
                             const newValue = inp.value.trim();
-                            
+
                             if (index > -1) {
                                 productos[index][field] = newValue;
                                 save();
                                 applyColorAndAlertLogic(inp, false);
-                                // Forzar la re-evaluación de las celdas posteriores en la misma fila
+                                
                                 const currentRowInputs = Array.from(inp.closest('tr').querySelectorAll('input[type="number"]'));
                                 const currentIndex = currentRowInputs.indexOf(inp);
                                 for (let j = currentIndex + 1; j < currentRowInputs.length; j++) {
@@ -762,45 +886,61 @@
                             }
                         });
                     });
-                    
+
                     tr.addEventListener('click', () => {
                         if (selectedRow) selectedRow.classList.remove('selected-row');
                         selectedRow = tr;
                         selectedRow.classList.add('selected-row');
-                        insertIndex = parseInt(tr.dataset.index); // Usar el índice original
                     });
                     tbody.appendChild(tr);
                 });
             }
-            
+
+            // =========================================================================
+            // LÓGICA DE BÚSQUEDA MINIMIZADA/GLOBAL
+            // =========================================================================
+            searchButton.addEventListener('click', () => {
+                // Al hacer clic en el botón, expandimos la barra
+                searchWrapper.classList.add('expanded');
+                setTimeout(() => {
+                    searchInput.focus();
+                    searchInput.value = ''; 
+                    render();
+                }, 300);
+            });
+
+            // Si el usuario borra el contenido y pierde el foco, volvemos al modo normal
+            searchInput.addEventListener('blur', () => {
+                if (searchInput.value.trim() === '') {
+                    searchWrapper.classList.remove('expanded');
+                    chipsEl.classList.remove('hidden'); // Asegurarse de que los chips se muestren
+                    // Volver al renderizado de la sección activa
+                    render();
+                }
+            });
+
+            searchInput.addEventListener('input', render);
+            // =========================================================================
+            // FIN LÓGICA DE BÚSQUEDA MINIMIZADA/GLOBAL
+            // =========================================================================
+
             btnAdd.onclick = () => {
                 const f = { seccion: seccionActiva, precio: '', nombre: '', t0700: '', t1200: '', t1500: '', t2200: '' };
                 const list = productos.filter(p => p.seccion === seccionActiva);
-                
+
                 if (list.length === 0) {
-                     // Si no hay elementos en la sección, simplemente lo agregamos al final (o inicio)
                      productos.push(f);
                      showToast('Fila agregada.', 'success');
-                } else if (selectedRow) {
-                    // Si se seleccionó una fila, insertamos después de ella.
-                    // Buscamos el índice en la lista original donde debemos insertar
-                    const indexToInsert = productos.findIndex(p => p.seccion === seccionActiva && p === list.find(l => l.nombre === selectedRow.querySelector('td.left').textContent.trim()));
-                    if (indexToInsert > -1) {
-                         productos.splice(indexToInsert + 1, 0, f);
-                         showToast('Fila agregada.', 'success');
-                    } else {
-                        // Fallback si no se encuentra (debería ser raro)
-                        productos.push(f);
-                        showToast('Fila agregada al final.', 'success');
-                    }
+                } else if (selectedRow && selectedRow.dataset.seccion === seccionActiva) {
+                    const selectedIndex = parseInt(selectedRow.dataset.index);
+                    productos.splice(selectedIndex + 1, 0, f);
+                    showToast('Fila agregada.', 'success');
                 } else {
-                    // Si no se seleccionó ninguna fila, lo agregamos después del último de la sección
                     const lastIndexInSection = productos.map(p => p.seccion).lastIndexOf(seccionActiva);
                     if (lastIndexInSection > -1) {
                         productos.splice(lastIndexInSection + 1, 0, f);
                         showToast('Fila agregada.', 'success');
                     } else {
-                        // Si la sección no existe en la lista (caso inicial)
                         productos.push(f);
                         showToast('Fila agregada al final.', 'success');
                     }
@@ -831,7 +971,6 @@
                     }
                     deleteModal.style.display = 'none';
                     selectedRow = null;
-                    insertIndex = null;
                 }
             };
             modalCancelBtn.onclick = () => {
@@ -869,15 +1008,14 @@
                 if (event.target === privacyModal) privacyModal.style.display = 'none';
             };
 
-            // Lógica para determinar el estilo de la celda en PDF
             function getPdfCellColor(currentValue, prevValue) {
                 const numCurrent = parseFloat(currentValue);
                 const numPrev = parseFloat(prevValue);
-                
+
                 if (isNaN(numCurrent) || isNaN(numPrev)) return null;
 
-                const increasedColor = [212, 237, 218]; // highlight-green
-                const decreasedColor = [248, 215, 218]; // highlight-red
+                const increasedColor = [212, 237, 218];
+                const decreasedColor = [248, 215, 218];
 
                 if (numCurrent < numPrev) return decreasedColor;
                 if (numCurrent > numPrev) return increasedColor;
@@ -889,7 +1027,7 @@
             // ******************************************************************
             btnExport.onclick = () => {
                 const dataAvailable = productos.filter(p => DEFAULT_SECCIONES.includes(p.seccion)).length > 0;
-                
+
                 if (!dataAvailable) {
                     showToast('No hay datos para exportar.', 'warning');
                     return;
@@ -946,7 +1084,7 @@
                             doc.text(`Fecha de Revisión: ${formattedReviewDate}`, marginX, yPos);
 
                             yPos += 8;
-                            
+
                             doc.setFontSize(8).setFont('helvetica', 'normal');
                             doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
 
@@ -973,9 +1111,9 @@
                                     doc.addPage();
                                 }
                                 isFirstPage = false;
-                                
+
                                 let currentY = addHeaderAndFooter(doc, seccion);
-                                
+
                                 const body = sectionData.map(d => [
                                     d.precio || '', d.nombre || '', d.t0700 || '', d.t1200 || '', d.t1500 || '', d.t2200 || ''
                                 ]);
@@ -997,13 +1135,13 @@
                                     },
                                     tableWidth: 'wrap', 
                                     margin: { left: marginX, right: marginX, top: 15, bottom: 15 }, 
-                                    
+
                                     // HOOK para colorear las celdas
                                     didParseCell: (data) => {
                                         const rowData = sectionData[data.row.index];
                                         const colIndex = data.column.index;
                                         let fillColor = null;
-                                        
+
                                         if (colIndex === 3) { // 12:00 (compara con 07:00)
                                             fillColor = getPdfCellColor(rowData.t1200, rowData.t0700);
                                         } else if (colIndex === 4) { // 15:00 (compara con 12:00)
@@ -1011,7 +1149,7 @@
                                         } else if (colIndex === 5) { // 22:00 (compara con 15:00)
                                             fillColor = getPdfCellColor(rowData.t2200, rowData.t1500);
                                         }
-                                        
+
                                         if (fillColor) {
                                             data.cell.styles.fillColor = fillColor;
                                         }
@@ -1022,10 +1160,9 @@
                                         const footerText = 'Powered by Rafael Ramos';
                                         doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
 
-                                        // Si es una página de continuación de tabla, reimprimir el encabezado
                                         if (data.pageNumber > 1) { 
                                             doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
-                                            data.cursor.y = 15; // Mover la tabla hacia abajo para el encabezado de página
+                                            data.cursor.y = 15;
                                         }
                                     }
                                 });
@@ -1116,7 +1253,7 @@
                 // Esconde la pantalla de inicio
                 setTimeout(() => { document.getElementById("splash").style.opacity = "0"; }, 1500);
                 setTimeout(() => { document.getElementById("splash").style.display = "none"; }, 2000);
-                
+
                 if (!reviewDateInput.value) {
                     reviewDateInput.value = getTodayDateFormattedForInput();
                 }
