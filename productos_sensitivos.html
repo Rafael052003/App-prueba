@@ -1295,41 +1295,48 @@
             // ************ LÓGICA DE OCULTAR BOTÓN CON TECLADO ACTIVO **********
             // ******************************************************************
 
+            // Usaremos visualViewport para detectar cambios de teclado.
+            // Establecemos la altura inicial al cargar.
             let initialViewportHeight = window.innerHeight;
-            const KEYBOARD_THRESHOLD = 150; // Umbral de cambio de altura para considerar el teclado visible
+            if ('visualViewport' in window) {
+                initialViewportHeight = window.visualViewport.height;
+            }
+            
+            // Umbral de cambio de altura (en píxeles) para considerar que el teclado está visible
+            const KEYBOARD_THRESHOLD = 150; 
 
             // Función para determinar si el botón de scroll debe mostrarse (se ha scrolleado)
             function shouldShowScrollButton() {
+                // Muestra el botón si el usuario ha scrolleado más de 300px
                 return (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300);
             }
             
+            // Función para determinar si el teclado virtual está activo
+            function isKeyboardCurrentlyActive() {
+                const currentHeight = ('visualViewport' in window) ? window.visualViewport.height : window.innerHeight;
+                // Si la altura actual es significativamente menor que la altura inicial, el teclado está activo.
+                return (currentHeight < (initialViewportHeight - KEYBOARD_THRESHOLD));
+            }
+
             // Función que maneja la lógica de visibilidad del botón de scroll
             function toggleScrollButtonVisibility() {
-                // 1. Detección del teclado virtual (solo relevante en móviles)
-                const viewportHeight = window.innerHeight;
-                let isKeyboardActive = false;
-                
-                // Si el viewport visible es mucho más pequeño que la altura inicial, asumimos que el teclado está activo.
-                if (viewportHeight < initialViewportHeight - KEYBOARD_THRESHOLD) {
-                    isKeyboardActive = true;
-                }
+                const isKeyboardActive = isKeyboardCurrentlyActive();
 
                 if (isKeyboardActive) {
-                    // Oculta el botón inmediatamente si el teclado está activo
+                    // 1. Teclado activo: Oculta el botón inmediatamente y detiene la animación.
                     scrollTopBtn.classList.remove('show');
                     scrollTopBtn.style.display = "none";
                 } else if (shouldShowScrollButton()) {
-                    // Si el teclado no está activo Y se ha scrolleado lo suficiente, muestra el botón
+                    // 2. Teclado inactivo y Scrolleado: Muestra el botón con animación.
                     scrollTopBtn.style.display = "block";
+                    // Pequeño timeout para que la animación CSS 'show' se active correctamente
                     setTimeout(() => { 
-                         // Pequeño timeout para que la animación CSS se active correctamente
-                        if (!isKeyboardActive) { // Doble chequeo para evitar parpadeos
-                            scrollTopBtn.classList.add('show');
-                        }
+                        scrollTopBtn.classList.add('show');
                     }, 50);
                 } else {
-                    // Si el teclado no está activo Y no se ha scrolleado, oculta el botón con animación
+                    // 3. Teclado inactivo y No scrolleado: Oculta el botón con animación.
                     scrollTopBtn.classList.remove('show');
+                    // Espera a que termine la animación de ocultar (0.3s) antes de aplicar display: none
                     setTimeout(() => {
                          if (!shouldShowScrollButton()) {
                              scrollTopBtn.style.display = "none";
@@ -1342,7 +1349,6 @@
             window.onscroll = toggleScrollButtonVisibility;
 
             // Evento para detectar cambios en el viewport (teclado virtual en móvil)
-            // Usamos window.visualViewport.onresize para una detección más fiable en el teclado virtual.
             if ('visualViewport' in window) {
                 window.visualViewport.onresize = toggleScrollButtonVisibility;
             } else {
@@ -1358,11 +1364,6 @@
                 setTimeout(() => { document.getElementById("splash").style.opacity = "0"; }, 1500);
                 setTimeout(() => { document.getElementById("splash").style.display = "none"; }, 2000);
 
-                // Inicializa la altura base del viewport al cargar
-                if ('visualViewport' in window) {
-                    initialViewportHeight = window.visualViewport.height;
-                }
-                
                 if (!reviewDateInput.value) {
                     reviewDateInput.value = getTodayDateFormattedForInput();
                 }
