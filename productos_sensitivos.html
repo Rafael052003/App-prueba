@@ -148,7 +148,7 @@
         /* Chips & Actions */
         .controls-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
         .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        
+
         .action-btn {
             background: var(--accent-color);
             color: white;
@@ -169,7 +169,7 @@
         .action-btn.danger:hover { background: #c0392b; }
         .action-btn.green { background: var(--success-color); }
         .action-btn.green:hover { background: #27ae60; }
-        
+
         .chips { 
             display: flex; 
             flex-wrap: wrap; 
@@ -195,7 +195,7 @@
         .chip:hover { transform: translateY(-1px); }
 
         /* --- ESTILOS COMPACTOS DE FECHA Y BÚSQUEDA --- */
-        
+
         .date-container {
             display: flex;
             align-items: center;
@@ -208,7 +208,7 @@
             border-top: 1px solid var(--border-color); 
             margin-top: 15px; 
         }
-        
+
         @media (min-width: 600px) {
             .date-container {
                 justify-content: center;
@@ -221,7 +221,7 @@
             color: var(--primary-color);
             white-space: nowrap;
         }
-        
+
         .date-container input[type="date"] {
             padding: 8px 10px;
             border: 1px solid var(--border-color);
@@ -323,6 +323,26 @@
         th { background: var(--primary-color); color: white; font-weight: 600; white-space: nowrap; }
         td.left { text-align: left; }
         th.product-sensitive { white-space: normal; line-height: 1.2; }
+
+        /* --- Columna de producto fija al hacer scroll horizontal --- */
+        th.product-sensitive,
+        td.left {
+            position: sticky;
+            left: 0;
+            z-index: 2;
+        }
+        th.product-sensitive {
+            z-index: 3;
+            background: var(--primary-color);
+        }
+        td.left {
+            background: var(--bg-card);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.08);
+        }
+        .selected-row td.left {
+            background-color: #e0f7fa !important;
+        }
+        /* --- FIN Columna de producto fija --- */
 
         /* Estilo de input dentro de celda */
         td input[type="number"] { 
@@ -543,7 +563,7 @@
         .sortable-drag .reorder-handle {
             color: white;
         }
-        
+
         /* Estilos mejorados para la configuración en pantalla completa */
         .settings-tab-content {
             display: flex;
@@ -588,7 +608,7 @@
             font-family: var(--font-main);
         }
         /* --- FIN ESTILOS ESPECÍFICOS DE CONFIGURACIÓN --- */
-        
+
         /* Responsive para pantallas pequeñas */
         @media (max-width: 768px) {
             #settingsTabs {
@@ -628,7 +648,7 @@
         <h2>PRODUCTOS</h2>
         <h2>SENSITIVOS</h2>
         <p>Powered by Rafael Ramos.</p>
-        <p>Versión 2.7</p>
+        <p>Versión 2.8</p>
     </div>
 
     <div id="sideMenu" class="side-menu">
@@ -636,6 +656,9 @@
         <button id="btnExportJson_menu" class="action-btn"><i class="fas fa-file-export"></i> Exportar Datos</button>
         <input type="file" id="fileInput" style="display: none;" accept=".json">
         <button id="btnImportJson_menu" class="action-btn"><i class="fas fa-file-import"></i> Importar Datos</button>
+        <p id="lastBackupInfo" style="font-size: 11px; color: rgba(255,255,255,0.7); text-align: center; margin-top: 10px;">
+            <i class="fas fa-shield-alt"></i> <span id="lastBackupText">Sin respaldos aún</span>
+        </p>
     </div>
     <div id="overlay" class="overlay"></div>
 
@@ -646,11 +669,11 @@
                 <h1>LISTADO DE PRODUCTOS SENSITIVOS</h1>
             </div>
         </header>
-        
+
         <div class="date-container">
             <label for="review-date"><i class="fas fa-calendar-alt"></i> Fecha:</label>
             <input type="date" id="review-date">
-            
+
             <div class="search-container">
                 <div id="searchWrapper">
                     <button id="searchButton" title="Buscar Producto Globalmente">
@@ -660,7 +683,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="controls-container">
             <div class="chips" id="chips">
                 </div>
@@ -770,12 +793,16 @@
         <div class="modal-content fullscreen">
             <span class="close-btn" data-modal-target="settingsModal">&times;</span>
             <h2 style="margin-bottom: 20px;"><i class="fas fa-cog"></i> Configuración de la Aplicación</h2>
-            
+
+            <button id="btnUndoChange" class="action-btn danger" style="display:none; align-self: center; margin-bottom: 15px;">
+                <i class="fas fa-undo"></i> Deshacer último cambio
+            </button>
+
             <div id="settingsTabs">
                 <button class="action-btn settings-tab-btn active" data-tab="product-crud">Gestión de Productos</button>
                 <button class="action-btn settings-tab-btn" data-tab="section-crud">Gestión de Secciones</button>
             </div>
-            
+
             <!-- Pestaña de Productos -->
             <div id="product-crud" class="settings-tab-content">
                 <div class="settings-section">
@@ -783,12 +810,12 @@
                     <p style="font-size: 13px; color: var(--secondary-color); margin-bottom: 15px;">
                         Aquí puedes agregar, editar, eliminar y reordenar productos dentro de cada sección.
                     </p>
-                    
+
                     <div class="settings-input-group">
                         <select id="settingSectionSelect" style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; flex-grow: 1; font-size: 14px;"></select>
                         <button id="btnAddProduct" class="action-btn green" style="width: auto; padding: 10px 20px; font-size: 14px;"><i class="fas fa-plus"></i> Agregar Producto</button>
                     </div>
-                    
+
                     <p style="font-size: 12px; color: var(--accent-color); margin-bottom: 15px; font-style: italic;">
                         <i class="fas fa-info-circle"></i> Para reordenar productos, arrastra y suelta los elementos usando el ícono de barras <i class="fas fa-grip-lines"></i>.
                     </p>
@@ -806,12 +833,12 @@
                     <p style="font-size: 13px; color: var(--secondary-color); margin-bottom: 15px;">
                         Las secciones corresponden a los "chips" que aparecen en la parte superior de la aplicación.
                     </p>
-                    
+
                     <div class="settings-input-group">
                         <input type="text" id="newSectionInput" placeholder="Nombre de la nueva sección" style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; flex-grow: 1; font-size: 14px;">
                         <button id="btnAddSection" class="action-btn green" style="width: auto; padding: 10px 20px; font-size: 14px;"><i class="fas fa-folder-plus"></i> Crear Sección</button>
                     </div>
-                    
+
                     <p style="font-size: 12px; color: var(--secondary-color); margin-bottom: 15px;">
                         <i class="fas fa-exclamation-triangle"></i> Al eliminar una sección, también se eliminarán todos los productos asociados a ella.
                     </p>
@@ -823,7 +850,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Modal de Editar Producto -->
     <div id="editProductModal" class="modal">
         <div class="modal-content">
@@ -832,7 +859,7 @@
             <div style="text-align: left; margin-top: 15px;">
                 <label for="editNombre" style="display: block; font-weight: 600; margin-bottom: 5px;">Nombre:</label>
                 <input type="text" id="editNombre" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
-                
+
                 <label for="editPrecio" style="display: block; font-weight: 600; margin-bottom: 5px;">Precio:</label>
                 <input type="number" id="editPrecio" style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 6px;">
             </div>
@@ -842,7 +869,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Modal Confirmar Eliminar Producto -->
     <div id="confirmDeleteProductModal" class="modal">
         <div class="modal-content">
@@ -876,9 +903,20 @@
         <div class="modal-content large-text">
             <span class="close-btn" data-modal-target="versionModal">&times;</span>
             <h2><i class="fas fa-code-branch"></i> Historial de Versiones</h2>
-            <p style="font-size: 14px; margin-bottom: 15px; color: var(--primary-color);">**Versión Actual: 2.7 (Diciembre 2025)**</p>
+            <p style="font-size: 14px; margin-bottom: 15px; color: var(--primary-color);">**Versión Actual: 2.8 (Septiembre 2026)**</p>
 
             <ul style="list-style-type: none; padding-left: 0;">
+                <li style="margin-bottom: 15px; border-left: 3px solid var(--success-color); padding-left: 10px;">
+                    <strong style="color: var(--success-color);">v2.8 (Columna Fija)</strong>
+                    <ul style="list-style-type: disc; padding-left: 20px; color: var(--secondary-color);">
+                        <li>**[NUEVO]** La columna "PRODUCTO SENSITIVO" ahora permanece fija al hacer scroll horizontal en la tabla.</li>
+                        <li>El precio y los horarios se desplazan detrás del nombre, que siempre queda visible.</li>
+                        <li>**[CORRECCIÓN]** La app ahora siempre abre en la sección FORMULAS al iniciar.</li>
+                        <li>**[CORRECCIÓN]** Se corrigió el número de versión mostrado en la pantalla de inicio.</li>
+                        <li>**[NUEVO]** Respaldo automático: la app genera y descarga un JSON de respaldo una vez al día automáticamente, sin necesidad de recordarlo manualmente. La fecha del último respaldo se muestra en el menú lateral.</li>
+                        <li>**[NUEVO]** Al cerrar Configuración, la vista principal cambia automáticamente a la sección que se estaba gestionando ahí.</li>
+                    </ul>
+                </li>
                 <li style="margin-bottom: 15px; border-left: 3px solid var(--success-color); padding-left: 10px;">
                     <strong style="color: var(--success-color);">v2.7 (Drag & Drop)</strong>
                     <ul style="list-style-type: disc; padding-left: 20px; color: var(--secondary-color);">
@@ -912,7 +950,7 @@
 
     <footer class="footer">
         <p style="margin-bottom: 5px;">
-            © 2025 Rafael Ramos. Todos los derechos reservados.
+            © 2025-2026 Rafael Ramos. Todos los derechos reservados.
         </p>
         <p>
             <a href="#" id="openTermsModal">Términos y Condiciones</a>
@@ -920,7 +958,7 @@
             <a href="#" id="openPrivacyModal">Política de Privacidad</a>
         </p>
         <p style="margin-top: 5px;">
-            <a href="#" id="openVersionModal">Versión 2.7</a>
+            <a href="#" id="openVersionModal">Versión 2.8</a>
         </p>
     </footer>
 
@@ -949,6 +987,8 @@
             }
 
             const STORAGE_KEY = 'productos_sensitivos_por_seccion';
+            const LAST_BACKUP_KEY = 'ultimo_respaldo_fecha';
+            const BACKUP_INTERVAL_DAYS = 1; // cada cuántos días se genera un respaldo automático
             let productos = [];
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
@@ -958,8 +998,8 @@
                 console.warn('localStorage JSON corrupto, reiniciando datos:', e);
                 productos = [];
             }
-            // Asegura que la sección activa sea válida
-            let seccionActiva = (productos.length > 0 && DEFAULT_SECCIONES.includes(productos[0].seccion)) ? productos[0].seccion : DEFAULT_SECCIONES[0];
+            // La app siempre debe abrir en la sección FORMULAS (si existe); si no, usa la primera sección disponible
+            let seccionActiva = DEFAULT_SECCIONES.includes('FORMULAS') ? 'FORMULAS' : DEFAULT_SECCIONES[0];
             let selectedRow = null;
             const tbody = document.getElementById('tbody');
             const chipsEl = document.getElementById('chips');
@@ -971,6 +1011,7 @@
             const fileInput = document.getElementById('fileInput');
             const btnExportJson_menu = document.getElementById('btnExportJson_menu');
             const btnImportJson_menu = document.getElementById('btnImportJson_menu');
+            const lastBackupText = document.getElementById('lastBackupText');
             const sideMenu = document.getElementById('sideMenu');
             const hamburgerBtn = document.getElementById('hamburgerBtn');
             const overlay = document.getElementById('overlay');
@@ -986,14 +1027,14 @@
             const openPrivacyModalBtn = document.getElementById('openPrivacyModal');
             const allCloseBtns = document.querySelectorAll('.close-btn');
             const reviewDateInput = document.getElementById('review-date');
-            
+
             const searchInput = document.getElementById('searchInput');
             const searchButton = document.getElementById('searchButton');
             const searchWrapper = document.getElementById('searchWrapper');
             const headerSection = document.getElementById('headerSection');
-            
+
             const scrollTopBtn = document.getElementById('scrollTopBtn');
-            
+
             // --- ELEMENTOS DE CONFIGURACIÓN Y VERSIÓN ---
             const btnOpenSettings = document.getElementById('btnOpenSettings');
             const settingsModal = document.getElementById('settingsModal');
@@ -1005,6 +1046,7 @@
             const sectionList = document.getElementById('sectionList');
             const newSectionInput = document.getElementById('newSectionInput');
             const btnAddSection = document.getElementById('btnAddSection');
+            const btnUndoChange = document.getElementById('btnUndoChange');
             const editProductModal = document.getElementById('editProductModal');
             const btnSaveProductEdit = document.getElementById('btnSaveProductEdit');
             const btnCancelProductEdit = document.getElementById('btnCancelProductEdit');
@@ -1026,7 +1068,7 @@
                     localStorage.setItem(DEFAULT_SECCIONES_KEY, JSON.stringify(DEFAULT_SECCIONES)); // Guardar secciones
                 }, 300);
             }
-            
+
             // =========================================================================
             // LÓGICA DE TOASTS
             // =========================================================================
@@ -1140,7 +1182,7 @@
                 tdPrecio.dataset.field = "precio";
                 tdPrecio.textContent = p.precio || '';
                 tr.appendChild(tdPrecio);
-                
+
                 // Columna PRODUCTO SENSITIVO
                 const tdNombre = document.createElement('td');
                 tdNombre.className = 'left';
@@ -1172,7 +1214,7 @@
             function render() {
                 const searchTerm = searchInput.value.toLowerCase().trim();
                 const isGlobalSearchActive = searchWrapper.classList.contains('expanded') && searchTerm;
-                
+
                 chipsEl.classList.toggle('hidden', isGlobalSearchActive);
                 headerSection.style.display = isGlobalSearchActive ? 'table-cell' : 'none';
 
@@ -1186,7 +1228,7 @@
                 } else {
                     list = productos.filter(p => p.seccion === seccionActiva);
                 }
-                
+
                 renderChips();
                 tbody.innerHTML = '';
                 selectedRow = null;
@@ -1231,7 +1273,7 @@
                                 productos[index][field] = newValue;
                                 save();
                                 applyColorAndAlertLogic(inp, false);
-                                
+
                                 const currentRowInputs = Array.from(inp.closest('tr').querySelectorAll('input[type="number"]'));
                                 const currentIndex = currentRowInputs.indexOf(inp);
                                 for (let j = currentIndex + 1; j < currentRowInputs.length; j++) {
@@ -1342,7 +1384,7 @@
                 e.preventDefault();
                 privacyModal.style.display = 'flex';
             };
-            
+
             openVersionModalBtn.onclick = (e) => {
                 e.preventDefault();
                 versionModal.style.display = 'flex';
@@ -1361,7 +1403,7 @@
                 if (numCurrent > numPrev) return increasedColor;
                 return null;
             }
-            
+
             function getValidFormattedDate(dateString) {
                 const dateRegex = /^(\d{4})-(\d{2})-(\d{2})$/; // YYYY-MM-DD
                 const match = dateString.match(dateRegex);
@@ -1377,7 +1419,7 @@
                     return { formatted: `${d}/${m}/${y}`, forFileName: `${d}-${m}-${y}` };
                 }
             }
-            
+
             function getTodayDateFormattedForInput() {
                 const today = new Date();
                 const year = today.getFullYear();
@@ -1447,7 +1489,7 @@
                             doc.setFontSize(8).setFont('helvetica', 'normal');
                             doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
 
-                            const footerText = 'Powered by Rafael Ramos | Versión 2.7';
+                            const footerText = 'Powered by Rafael Ramos | Versión 2.8';
                             doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
 
                             return yPos;
@@ -1515,7 +1557,7 @@
 
                                     didDrawPage: (data) => {
                                         doc.setFontSize(8).setFont('helvetica', 'normal');
-                                        const footerText = 'Powered by Rafael Ramos | Versión 2.7';
+                                        const footerText = 'Powered by Rafael Ramos | Versión 2.8';
                                         doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
 
                                         if (data.pageNumber > 1) { 
@@ -1543,9 +1585,62 @@
             // ************ FIN DE FUNCIÓN CON jsPDF.autoTable() ****************
             // ******************************************************************
 
-            const handleExportJson = () => {
+            // =========================================================================
+            // LÓGICA DE RESPALDO AUTOMÁTICO
+            // =========================================================================
+            function setLastBackupDate(date) {
+                localStorage.setItem(LAST_BACKUP_KEY, date.toISOString());
+                renderLastBackupInfo();
+            }
+
+            function getLastBackupDate() {
+                const raw = localStorage.getItem(LAST_BACKUP_KEY);
+                return raw ? new Date(raw) : null;
+            }
+
+            function renderLastBackupInfo() {
+                if (!lastBackupText) return;
+                const lastBackup = getLastBackupDate();
+                if (!lastBackup) {
+                    lastBackupText.textContent = 'Sin respaldos aún';
+                    return;
+                }
+                const d = String(lastBackup.getDate()).padStart(2, '0');
+                const m = String(lastBackup.getMonth() + 1).padStart(2, '0');
+                const y = lastBackup.getFullYear();
+                const hh = String(lastBackup.getHours()).padStart(2, '0');
+                const mm = String(lastBackup.getMinutes()).padStart(2, '0');
+                lastBackupText.textContent = `Último respaldo: ${d}/${m}/${y} ${hh}:${mm}`;
+            }
+
+            function checkAutoBackup() {
                 if (!productos.length) {
-                    showToast('No hay datos para exportar.', 'warning');
+                    renderLastBackupInfo();
+                    return; // no hay nada que respaldar todavía
+                }
+                const lastBackup = getLastBackupDate();
+                const now = new Date();
+
+                if (!lastBackup) {
+                    // Nunca se ha hecho un respaldo: se genera uno ahora como línea base
+                    handleExportJson(true);
+                    return;
+                }
+
+                const diffDays = (now - lastBackup) / (1000 * 60 * 60 * 24);
+                if (diffDays >= BACKUP_INTERVAL_DAYS) {
+                    handleExportJson(true);
+                } else {
+                    renderLastBackupInfo();
+                }
+            }
+            // =========================================================================
+            // FIN LÓGICA DE RESPALDO AUTOMÁTICO
+            // =========================================================================
+
+            const handleExportJson = (isAuto = false) => {
+                if (!productos.length) {
+                    if (!isAuto) showToast('No hay datos para exportar.', 'warning');
                     return;
                 }
                 const dataStr = JSON.stringify(productos, null, 2);
@@ -1557,17 +1652,19 @@
                 const d = String(today.getDate()).padStart(2, '0');
                 const m = String(today.getMonth() + 1).padStart(2, '0');
                 const y = today.getFullYear();
-                a.download = `backup_productos_sensitivos_${y}-${m}-${d}.json`;
+                const prefix = isAuto ? 'respaldo_auto' : 'backup';
+                a.download = `${prefix}_productos_sensitivos_${y}-${m}-${d}.json`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                showToast('Datos exportados.', 'success');
+                setLastBackupDate(today);
+                showToast(isAuto ? 'Respaldo automático generado.' : 'Datos exportados.', 'success', isAuto ? 4000 : 3000);
             };
             const handleImportJson = () => {
                 fileInput.click();
             };
-            btnExportJson_menu.onclick = handleExportJson;
+            btnExportJson_menu.onclick = () => handleExportJson(false);
             btnImportJson_menu.onclick = handleImportJson;
             fileInput.onchange = (event) => {
                 const file = event.target.files[0];
@@ -1613,7 +1710,59 @@
             // ******************************************************************
             // ************ LÓGICA DEL MÓDULO DE CONFIGURACIÓN (CRUD) ***********
             // ******************************************************************
-            
+
+            // =========================================================================
+            // SISTEMA DE "DESHACER ÚLTIMO CAMBIO" EN CONFIGURACIÓN
+            // =========================================================================
+            let preChangeSnapshot = null;
+
+            function saveSnapshotBeforeChange() {
+                preChangeSnapshot = {
+                    productos: JSON.parse(JSON.stringify(productos)),
+                    secciones: JSON.parse(JSON.stringify(DEFAULT_SECCIONES)),
+                    seccionActiva: seccionActiva,
+                    settingSection: settingSectionSelect.value
+                };
+                updateUndoButtonVisibility();
+            }
+
+            function updateUndoButtonVisibility() {
+                if (!btnUndoChange) return;
+                btnUndoChange.style.display = preChangeSnapshot ? 'flex' : 'none';
+            }
+
+            function clearUndoSnapshot() {
+                preChangeSnapshot = null;
+                updateUndoButtonVisibility();
+            }
+
+            function undoLastChange() {
+                if (!preChangeSnapshot) return;
+                productos = preChangeSnapshot.productos;
+                DEFAULT_SECCIONES = preChangeSnapshot.secciones;
+                seccionActiva = preChangeSnapshot.seccionActiva;
+                const settingSectionToRestore = preChangeSnapshot.settingSection;
+                preChangeSnapshot = null;
+
+                save();
+                renderSettingsSectionSelect();
+                if (DEFAULT_SECCIONES.includes(settingSectionToRestore)) {
+                    settingSectionSelect.value = settingSectionToRestore;
+                    renderProductList(true);
+                }
+                renderSectionList();
+                render();
+                updateUndoButtonVisibility();
+                showToast('Último cambio deshecho.', 'success');
+            }
+
+            if (btnUndoChange) {
+                btnUndoChange.onclick = undoLastChange;
+            }
+            // =========================================================================
+            // FIN SISTEMA DE "DESHACER ÚLTIMO CAMBIO"
+            // =========================================================================
+
             // Función auxiliar para reordenar un array
             function arrayMove(arr, oldIndex, newIndex) {
                 if (newIndex >= arr.length) {
@@ -1632,7 +1781,7 @@
                     .filter(item => item.p.seccion === seccion)
                     .map(item => item.index);
             }
-            
+
             // Inicializa Sortable.js en la lista de productos
             function initializeSortable(currentSection) {
                 if (sortableInstance) {
@@ -1644,20 +1793,21 @@
                     handle: '.reorder-handle', // Solo se mueve al arrastrar el ícono
                     ghostClass: 'sortable-ghost',
                     dragClass: 'sortable-drag',
-                    
+
                     onEnd: function (evt) {
                         const oldIndexLocal = evt.oldIndex;
                         const newIndexLocal = evt.newIndex;
-                        
+
                         if (oldIndexLocal !== newIndexLocal) {
                             const indicesInSection = getProductIndicesBySection(currentSection);
-                            
+
                             const oldGlobalIndex = indicesInSection[oldIndexLocal];
                             const newGlobalIndex = indicesInSection[newIndexLocal];
-                            
-                            // 1. Mover el elemento dentro del array global 'productos'
+
+                            // 1. Guardar snapshot para poder deshacer, y mover el elemento
+                            saveSnapshotBeforeChange();
                             arrayMove(productos, oldGlobalIndex, newGlobalIndex);
-                            
+
                             // 2. Guardar y actualizar interfaces
                             save();
                             renderProductList(); // Re-renderiza la lista de configuración para reasignar data-index
@@ -1700,7 +1850,7 @@
                 actions.style.gap = '8px';
                 actions.style.alignItems = 'center';
 
-                
+
                 const btnEdit = document.createElement('button');
                 btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
                 btnEdit.className = 'action-btn';
@@ -1733,7 +1883,7 @@
             function renderProductList(shouldInitializeSortable = false) {
                 const currentSettingSection = settingSectionSelect.value;
                 const filteredList = productos.filter(p => p.seccion === currentSettingSection);
-                
+
                 productList.innerHTML = '';
 
                 if (filteredList.length === 0) {
@@ -1746,7 +1896,7 @@
                     const index = productos.indexOf(p); 
                     productList.appendChild(renderProductItem(p, index));
                 });
-                
+
                 if (shouldInitializeSortable) {
                     initializeSortable(currentSettingSection);
                 }
@@ -1773,7 +1923,7 @@
                     btnDelete.style.height = '30px';
                     btnDelete.style.borderRadius = '50%';
                     btnDelete.onclick = () => deleteSection(s);
-                    
+
                     if (DEFAULT_SECCIONES.length > 1) {
                          div.appendChild(btnDelete);
                     } else {
@@ -1793,7 +1943,7 @@
                 const cancelBtn = document.getElementById('cancelDeleteProductBtn');
                 const msgEl = document.getElementById('confirmDeleteProductMsg');
 
-                msgEl.textContent = `¿Seguro que desea eliminar el producto "${productos[index].nombre}"?`;
+                msgEl.textContent = `¿Seguro que desea eliminar el producto "${productos[index].nombre}"? Podrás deshacerlo con el botón "Deshacer último cambio" si te arrepientes.`;
                 confirmModal.style.display = 'flex';
 
                 // Clonar botones para eliminar listeners anteriores
@@ -1804,6 +1954,7 @@
 
                 newConfirm.onclick = () => {
                     confirmModal.style.display = 'none';
+                    saveSnapshotBeforeChange();
                     productos.splice(index, 1);
                     save();
                     renderProductList(true);
@@ -1825,6 +1976,7 @@
 
             btnSaveProductEdit.onclick = () => {
                 if (currentProductIndexToEdit > -1) {
+                    saveSnapshotBeforeChange();
                     productos[currentProductIndexToEdit].nombre = editNombreInput.value.trim();
                     productos[currentProductIndexToEdit].precio = editPrecioInput.value.trim();
                     save();
@@ -1848,7 +2000,8 @@
                     nombre: 'Nuevo Producto', 
                     t0700: '', t1200: '', t1500: '', t2200: '' 
                 };
-                
+
+                saveSnapshotBeforeChange();
                 // Buscar el índice del último elemento de la sección para insertarlo después
                 const lastIndexInSection = productos.map(p => p.seccion).lastIndexOf(newSection);
                 if (lastIndexInSection > -1) {
@@ -1866,6 +2019,7 @@
             btnAddSection.onclick = () => {
                 const newSectionName = newSectionInput.value.trim().toUpperCase();
                 if (newSectionName && !DEFAULT_SECCIONES.includes(newSectionName)) {
+                    saveSnapshotBeforeChange();
                     DEFAULT_SECCIONES.push(newSectionName);
                     save();
                     renderSectionList();
@@ -1879,7 +2033,7 @@
                     showToast('Ingrese un nombre de sección válido.', 'error');
                 }
             };
-            
+
             function deleteSection(name) {
                 if (DEFAULT_SECCIONES.length === 1) {
                     showToast('Debe existir al menos una sección.', 'error');
@@ -1891,7 +2045,8 @@
                 const cancelBtn = document.getElementById('cancelDeleteSectionBtn');
                 const msgEl = document.getElementById('confirmDeleteSectionMsg');
 
-                msgEl.textContent = `ADVERTENCIA: ¿Desea eliminar la sección "${name}"? Esto también eliminará TODOS los productos asociados a ella.`;
+                const productCount = productos.filter(p => p.seccion === name).length;
+                msgEl.textContent = `ADVERTENCIA: ¿Desea eliminar la sección "${name}"? Esto también eliminará los ${productCount} producto(s) asociados a ella. Podrás deshacerlo con "Deshacer último cambio" si te arrepientes.`;
                 confirmModal.style.display = 'flex';
 
                 // Clonar botones para eliminar listeners anteriores
@@ -1902,6 +2057,7 @@
 
                 newConfirm.onclick = () => {
                     confirmModal.style.display = 'none';
+                    saveSnapshotBeforeChange();
                     // 1. Eliminar sección de la lista de secciones
                     DEFAULT_SECCIONES = DEFAULT_SECCIONES.filter(s => s !== name);
                     // 2. Eliminar productos asociados
@@ -1927,7 +2083,7 @@
                 settingsModal.style.display = 'flex';
                 sideMenu.classList.remove('open');
                 overlay.classList.remove('active');
-                
+
                 // Asegurar que la pestaña de Productos esté activa por defecto
                 settingsTabBtns.forEach(b => {
                      b.classList.remove('active');
@@ -1935,12 +2091,12 @@
                 });
                 document.querySelector('[data-tab="product-crud"]').classList.add('active');
                 document.getElementById('product-crud').style.display = 'flex';
-                
+
                 // Renderizar y Inicializar Sortable
                 renderSettingsSectionSelect(); 
                 renderSectionList();
             };
-            
+
             // Cuando cambia la sección en el select, renderizar la lista e inicializar Sortable
             settingSectionSelect.onchange = () => renderProductList(true);
 
@@ -1951,7 +2107,7 @@
 
                     btn.classList.add('active');
                     document.getElementById(btn.dataset.tab).style.display = 'flex';
-                    
+
                     if (btn.dataset.tab === 'product-crud') {
                         renderProductList(true);
                     } else if (btn.dataset.tab === 'section-crud') {
@@ -1959,19 +2115,41 @@
                     }
                 };
             });
-            
+
+            // Sincroniza la sección activa de la vista principal con la que se estaba
+            // gestionando en Configuración, para no perder el hilo al cerrar el modal.
+            function syncActiveSectionFromSettings() {
+                const chosen = settingSectionSelect.value;
+                if (chosen && DEFAULT_SECCIONES.includes(chosen) && chosen !== seccionActiva) {
+                    seccionActiva = chosen;
+                    searchInput.value = '';
+                    searchWrapper.classList.remove('expanded');
+                    chipsEl.classList.remove('hidden');
+                    render();
+                    checkDifferencesInActiveSection();
+                }
+            }
+
+            function closeModal(modalEl) {
+                if (!modalEl) return;
+                modalEl.style.display = 'none';
+                if (modalEl.id === 'settingsModal') {
+                    syncActiveSectionFromSettings();
+                }
+            }
+
             // Cierre de modales
             allCloseBtns.forEach(btn => {
                 btn.onclick = () => { 
                     const targetModalId = btn.dataset.modalTarget || btn.closest('.modal').id;
-                    document.getElementById(targetModalId).style.display = 'none'; 
+                    closeModal(document.getElementById(targetModalId));
                 };
             });
-            
+
             // Cierre global al hacer clic fuera del modal
             window.onclick = (event) => {
                 if (event.target.classList && event.target.classList.contains('modal')) {
-                    event.target.style.display = 'none';
+                    closeModal(event.target);
                 }
             };
 
@@ -1983,13 +2161,13 @@
             if ('visualViewport' in window) {
                 initialViewportHeight = window.visualViewport.height;
             }
-            
+
             const KEYBOARD_THRESHOLD = 150; 
 
             function shouldShowScrollButton() {
                 return (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300);
             }
-            
+
             function isKeyboardCurrentlyActive() {
                 const currentHeight = ('visualViewport' in window) ? window.visualViewport.height : window.innerHeight;
                 return (currentHeight < (initialViewportHeight - KEYBOARD_THRESHOLD));
@@ -2015,7 +2193,7 @@
                     }, 300);
                 }
             }
-            
+
             window.onscroll = toggleScrollButtonVisibility;
 
             if ('visualViewport' in window) {
@@ -2023,7 +2201,7 @@
             } else {
                 window.addEventListener('resize', toggleScrollButtonVisibility);
             }
-            
+
             // Inicialización
             window.addEventListener("load", () => {
                 setTimeout(() => { document.getElementById("splash").style.opacity = "0"; }, 1500);
@@ -2034,6 +2212,7 @@
                 }
                 render();
                 checkDifferencesInActiveSection();
+                checkAutoBackup();
             });
         })();
     </script>
