@@ -29,7 +29,13 @@
             --font-main: 'Poppins', sans-serif;
             --highlight-green: #d4edda;
             --highlight-red: #f8d7da;
-            --highlight-yellow: #fff3cd; 
+            --highlight-yellow: #fff3cd;
+
+            /* Paleta estacional de octubre */
+            --ribbon-pink: #f48fb1;
+            --ribbon-blue: #81d4fa;
+            --chitre-blue: #1565c0;
+            --chitre-yellow: #fdd835;
         }
 
         /* Estilos generales y resets */
@@ -50,6 +56,8 @@
             background: var(--bg-card);
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border-top: 6px solid transparent;
+            transition: border-image 0.4s ease;
         }
         @media (max-width: 768px) {
             .main-content {
@@ -57,6 +65,55 @@
                 padding: 15px;
             }
         }
+
+        /* --- TEMA ESTACIONAL: OCTUBRE (Concientización rosa/celeste) --- */
+        body.theme-awareness .main-content {
+            border-image: linear-gradient(90deg, var(--ribbon-pink), var(--ribbon-blue)) 1;
+        }
+        body.theme-awareness .chip.active {
+            background: linear-gradient(90deg, var(--ribbon-pink), var(--ribbon-blue));
+            color: #fff;
+        }
+        body.theme-awareness #splashRibbon {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        /* --- TEMA ESTACIONAL: FUNDACIÓN DE CHITRÉ (13-19 de octubre) --- */
+        body.theme-founding .main-content {
+            border-image: linear-gradient(90deg, var(--chitre-blue), var(--chitre-yellow)) 1;
+        }
+        body.theme-founding .chip.active {
+            background: linear-gradient(90deg, var(--chitre-blue), var(--chitre-yellow));
+            color: var(--primary-color);
+        }
+        body.theme-founding #splashRibbon {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        #seasonalBanner {
+            display: none;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        body.theme-awareness #seasonalBanner {
+            display: block;
+            background: linear-gradient(90deg, rgba(244,143,177,0.15), rgba(129,212,250,0.15));
+            color: var(--primary-color);
+            border: 1px solid var(--ribbon-blue);
+        }
+        body.theme-founding #seasonalBanner {
+            display: block;
+            background: linear-gradient(90deg, rgba(21,101,192,0.12), rgba(253,216,53,0.18));
+            color: var(--primary-color);
+            border: 1px solid var(--chitre-blue);
+        }
+        /* --- FIN TEMA ESTACIONAL --- */
 
         /* Splash Screen */
         #splash {
@@ -70,6 +127,12 @@
         #splash img { width: 120px; margin-bottom: 20px; }
         #splash h2 { font-weight: 700; font-size: 32px; margin-bottom: 10px; }
         #splash p { margin-top: 5px; font-size: 14px; opacity: 0.9; }
+        #splash #splashSeasonalText {
+            margin-top: 15px;
+            font-size: 13px;
+            opacity: 0.85;
+            max-width: 260px;
+        }
 
         /* Header & Titles */
         header {
@@ -644,11 +707,13 @@
 </head>
 <body>
     <div id="splash">
+        <div id="splashRibbon"></div>
         <img src="icon-192.png" alt="Logo">
         <h2>PRODUCTOS</h2>
         <h2>SENSITIVOS</h2>
         <p>Powered by Rafael Ramos.</p>
-        <p>Versión 2.8</p>
+        <p>Versión 2.9</p>
+        <p id="splashSeasonalText"></p>
     </div>
 
     <div id="sideMenu" class="side-menu">
@@ -669,6 +734,8 @@
                 <h1>LISTADO DE PRODUCTOS SENSITIVOS</h1>
             </div>
         </header>
+
+        <div id="seasonalBanner"></div>
 
         <div class="date-container">
             <label for="review-date"><i class="fas fa-calendar-alt"></i> Fecha:</label>
@@ -903,9 +970,18 @@
         <div class="modal-content large-text">
             <span class="close-btn" data-modal-target="versionModal">&times;</span>
             <h2><i class="fas fa-code-branch"></i> Historial de Versiones</h2>
-            <p style="font-size: 14px; margin-bottom: 15px; color: var(--primary-color);">**Versión Actual: 2.8 (Septiembre 2026)**</p>
+            <p style="font-size: 14px; margin-bottom: 15px; color: var(--primary-color);">**Versión Actual: 2.9 (Octubre 2026)**</p>
 
             <ul style="list-style-type: none; padding-left: 0;">
+                <li style="margin-bottom: 15px; border-left: 3px solid var(--ribbon-blue); padding-left: 10px;">
+                    <strong style="color: #e91e8c;">v2.9 (Tema de Octubre)</strong>
+                    <ul style="list-style-type: disc; padding-left: 20px; color: var(--secondary-color);">
+                        <li>**[NUEVO]** Tema visual de cintas rosa/celeste (borde y chips en degradado) activo de forma permanente en conmemoración del Mes de Concientización.</li>
+                        <li>**[NUEVO]** Del 13 al 19 de octubre, el tema cambia automáticamente a los colores azul/amarillo de la Fundación de Chitré (19 de octubre), con prioridad sobre el de cintas.</li>
+                        <li>**[NUEVO]** Aviso especial en la pantalla de bienvenida y en un banner dentro de la app según la fecha.</li>
+                        <li>**[NUEVO]** El 19 de octubre se muestra un mensaje de felicitación por el aniversario de fundación de Chitré.</li>
+                    </ul>
+                </li>
                 <li style="margin-bottom: 15px; border-left: 3px solid var(--success-color); padding-left: 10px;">
                     <strong style="color: var(--success-color);">v2.8 (Columna Fija)</strong>
                     <ul style="list-style-type: disc; padding-left: 20px; color: var(--secondary-color);">
@@ -958,7 +1034,7 @@
             <a href="#" id="openPrivacyModal">Política de Privacidad</a>
         </p>
         <p style="margin-top: 5px;">
-            <a href="#" id="openVersionModal">Versión 2.8</a>
+            <a href="#" id="openVersionModal">Versión 2.9</a>
         </p>
     </footer>
 
@@ -1058,6 +1134,54 @@
             let currentProductIndexToEdit = -1;
             let sortableInstance = null; // Instancia de Sortable.js
             // ----------------------------------------------------
+
+            // =========================================================================
+            // TEMA ESTACIONAL DE OCTUBRE (Concientización rosa/celeste + Fundación de Chitré)
+            // =========================================================================
+            const seasonalBanner = document.getElementById('seasonalBanner');
+            const splashRibbon = document.getElementById('splashRibbon');
+            const splashSeasonalText = document.getElementById('splashSeasonalText');
+
+            function getSeasonalContext() {
+                const now = new Date();
+                const month = now.getMonth(); // 9 = octubre
+                const day = now.getDate();
+                return {
+                    isFoundingWeek: month === 9 && day >= 13 && day <= 19,
+                    isFoundingDay: month === 9 && day === 19
+                };
+            }
+
+            function applySeasonalTheme() {
+                document.body.classList.remove('theme-awareness', 'theme-founding');
+                const ctx = getSeasonalContext();
+
+                if (ctx.isFoundingWeek) {
+                    // Del 13 al 19 de octubre, la Fundación de Chitré tiene prioridad sobre el tema de cintas
+                    document.body.classList.add('theme-founding');
+                    const msg = 'Viva Chitré 178 años - Fundación de Chitré (19 de Octubre) "La Ciudad Que Crece Sola"';
+                    if (seasonalBanner) { seasonalBanner.textContent = msg; seasonalBanner.style.display = 'block'; }
+                    if (splashRibbon) splashRibbon.textContent = '';
+                    if (splashSeasonalText) splashSeasonalText.textContent = msg;
+                } else {
+                    // Tema de cintas rosa y celeste activo de forma permanente
+                    document.body.classList.add('theme-awareness');
+                    const msg = 'Mes de Concientización — Cintas Rosa y Celeste';
+                    const pinkColor = getComputedStyle(document.documentElement).getPropertyValue('--ribbon-pink').trim();
+                    const blueColor = getComputedStyle(document.documentElement).getPropertyValue('--ribbon-blue').trim();
+                    const makeRibbonIcon = (size, boxW, boxH, offset1, offset2) =>
+                        '<span style="position:relative;display:inline-block;width:' + boxW + 'px;height:' + boxH + 'px;vertical-align:middle;">'
+                        + '<i class="fas fa-ribbon" style="position:absolute;left:' + offset1 + 'px;top:0;color:' + pinkColor + ';font-size:' + size + 'px;transform:rotate(-18deg);"></i>'
+                        + '<i class="fas fa-ribbon" style="position:absolute;left:' + offset2 + 'px;top:0;color:' + blueColor + ';font-size:' + size + 'px;transform:rotate(18deg) scaleX(-1);"></i>'
+                        + '</span>';
+                    if (seasonalBanner) { seasonalBanner.innerHTML = makeRibbonIcon(16, 26, 16, 2, 10) + ' ' + msg; seasonalBanner.style.display = 'block'; }
+                    if (splashRibbon) splashRibbon.innerHTML = makeRibbonIcon(34, 60, 46, 6, 20);
+                    if (splashSeasonalText) splashSeasonalText.textContent = msg;
+                }
+            }
+            // =========================================================================
+            // FIN TEMA ESTACIONAL
+            // =========================================================================
 
             let saveTimer = null;
 
@@ -1489,7 +1613,7 @@
                             doc.setFontSize(8).setFont('helvetica', 'normal');
                             doc.text(`Página ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - marginX, 10, { align: 'right' }); 
 
-                            const footerText = 'Powered by Rafael Ramos | Versión 2.8';
+                            const footerText = 'Powered by Rafael Ramos | Versión 2.9';
                             doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
 
                             return yPos;
@@ -1557,7 +1681,7 @@
 
                                     didDrawPage: (data) => {
                                         doc.setFontSize(8).setFont('helvetica', 'normal');
-                                        const footerText = 'Powered by Rafael Ramos | Versión 2.8';
+                                        const footerText = 'Powered by Rafael Ramos | Versión 2.9';
                                         doc.text(footerText, doc.internal.pageSize.width / 2, pageHeight - 5, { align: 'center' });
 
                                         if (data.pageNumber > 1) { 
@@ -2210,6 +2334,15 @@
                 if (!reviewDateInput.value) {
                     reviewDateInput.value = getTodayDateFormattedForInput();
                 }
+
+                applySeasonalTheme();
+                const seasonalCtx = getSeasonalContext();
+                if (seasonalCtx.isFoundingDay) {
+                    setTimeout(() => {
+                        showToast('¡Feliz Aniversario de Fundación de Chitré! 🎉', 'success', 5000);
+                    }, 2200);
+                }
+
                 render();
                 checkDifferencesInActiveSection();
                 checkAutoBackup();
